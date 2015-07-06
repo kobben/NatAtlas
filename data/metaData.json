@@ -1,0 +1,114 @@
+{
+  "atlasLanguages": ["Nederlands", "English"],
+  "atlasName": ["Nationale Atlas van Nederland","National Atlas of The Netherlands"],
+  "atlasVersion": "0.6",
+  "atlasCopyright": ["©2011-15: Stichting Wetenschappelijke Atlas Nederland","©2011-15: Foundation Scientific Atlas of the Netherlands"],
+  "baseMapDataURL": "./data/basemap/data.geojson",
+  "baseMapClassAttr": "name",
+  "geo_sources": [
+    {
+      "num": "0",
+      "name": ["per gemeente","per municipality"],
+      "description": ["Gegeneraliseerde gemeentegrenzen afkomstig uit de Basis Registratie Kartografie van het Kadaster. ","Municipalities of the Netherlands, generalised from the Base Registration Cartography of the Kadaster. "],
+      "date": "2011",
+      "FK_attrib": "GM_CODE",
+      "source": ["CBS/Kadaster","CBS/Kadaster"],
+      "serviceType": "localfile",
+      "serviceURL": "./data/gemeenten/geo.json",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "json"
+    },
+    {
+      "num": "1",
+      "name": ["per provincie","per province"],
+      "description": ["Gegeneraliseerde provinciegrenzen, geaggregeerd uit de gemeentegrenzen afkomstig uit de Basis Registratie Kartografie van het Kadaster. ","Provinces of the Netherlands, aggegrated from municipal borders. "],
+      "date": "2011",
+      "FK_attrib": "prov_code",
+      "source": ["CBS/Kadaster","CBS/Kadaster"],
+      "serviceType": "localfile",
+      "serviceURL": "./data/provincies/geo.json",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "json"
+    }
+  ],
+  "attrib_sources": [
+    {
+      "num": "0",
+      "name": "CBSGemeenten",
+      "description": ["Statistische kerncijfers per gemeente (geselecteerd uit StatLine)","Statistical key numbers per municipality (selected from StatLine)"],
+      "date": "2011",
+      "FK_attrib": "GM_CODE",
+      "source": ["Centraal Bureau voor de Statistiek (CBS)","Centraal Bureau voor de Statistiek (CBS)"],
+      "serviceType": "localfile",
+      "serviceURL": "./data/gemeenten/attribs.csv",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "csv"
+    },
+    {
+      "num": "1",
+      "name": "CBSProvincies",
+      "description": ["Statistische kerncijfers per provincie (geselecteerd uit StatLine)","Statistical key numbers per province (selected from StatLine)"],
+      "date": "2011",
+      "FK_attrib": "prov_code",
+      "source": ["Centraal Bureau voor de Statistiek (CBS)","Centraal Bureau voor de Statistiek (CBS)"],
+      "serviceType": "localfile",
+      "serviceURL": "./data/provincies/attribs.csv",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "csv"
+    }
+  ],
+  "mapgroups": [
+    {
+      "groupnum": "0",
+      "groupname": ["Bevolking","Population"],
+      "groupDescription": ["Kerncijfers over de bevolking.","Key numbers on population."],
+      "maps": [
+        {
+          "name": ["Aantal inwoners","Number of inhabitants"],
+          "unit": [" inwoners"," inhabitats"],
+          "map_units": [0, 1],
+          "data_sources": [0, 1],
+          "FKs": ["GM_Code","prov_code"],
+          "data_attributes": ["AANT_INW", "aant_inw"],
+          "maptype": "point_size"
+        },
+        {
+          "name": ["Aantal Mannen","Number of Males"],
+          "unit": [" inwoners"," inhabitats"],
+          "map_units": [0],
+          "data_sources": [0],
+          "FKs": ["GM_Code"],
+          "data_attributes": ["AANT_MAN"],
+          "maptype": "point_size"
+        },
+        {
+          "name": ["Aantal Vrouwen","Number of Females"],
+          "unit": [" inwoners"," inhabitats"],
+          "map_units": [0],
+          "data_sources": [0],
+          "FKs": ["GM_Code"],
+          "data_attributes": ["AANT_VROUW"],
+          "maptype": "point_size"
+        },
+        {
+          "name": ["Bevolkingsdichtheid","Population Density"],
+          "unit": [" inwoners per km2"," inhabitants per km2"],
+          "map_units": [0, 1],
+          "data_sources": [0, 1],
+          "FKs": ["GM_Code","prov_code"],
+          "data_attributes": ["BEV_DICHTH", "bev_dichth"],
+          "maptype": "area_value"
+        },
+        {
+          "name": ["Provincienaam","Province Name"],
+          "unit": "",
+          "map_units": [1],
+          "data_sources": [1],
+          "FKs": ["prov_code"],
+          "data_attributes": ["prov_name"],
+          "maptype": "area_label"
+        }
+      ]
+    }
+  ]
+}

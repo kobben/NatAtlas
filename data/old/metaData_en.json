@@ -1,0 +1,307 @@
+{
+  "atlasName": "National Atlas of The Netherlands",
+  "atlasVersion": "0.5",
+  "atlasCopyright": "copyright 2011-15: Stichting Wetenschappelijke Atlas Nederland",
+  "baseMapDataURL": "./data/basemap/data.geojson",
+  "baseMapClassAttr": "name",
+  "mapgroups": [
+    {
+      "groupnum": "0",
+      "groupname": "Statistic Core Data per Municipality",
+      "groupDescription": "Municipal data consists of the geometry of all municipalities of The Netherlands wit a number of core statistics as attributes. The municipal borders are generalised from the Base Registration Cartography of the Kadaster. ",
+      "date": "2011",
+      "defaultLabelAttribute": "GM_NAAM",
+      "source": "Source: Statistics Netherlands (CBS)",
+      "//serviceType": "WFS",
+      "//serviceVersion": "1.1.0",
+      "//serviceURL": "http://geoserver.itc.nl/geoserver/wfs?",
+      "serviceType": "localfile",
+      "serviceURL": "./data/gemeenten/data.geojson",
+      "serviceTypeName": "natatlas%3AWijkenBuurten2011%3AGemeenten_2011",
+      "serviceOutputFormat": "json",
+      "maps": [
+        {
+          "data_attributes": "GM_CODE",
+          "unit": "",
+          "name": "Municipality code",
+          "maptype": "area_colour"
+        },
+        {
+          "data_attributes": "GM_NAAM",
+          "unit": "",
+          "name": "Municipality name",
+          "maptype": "area_label"
+        },
+        {
+          "data_attributes": "AANT_INW",
+          "unit": " inhabitants",
+          "name": "Number of inhabitants",
+          "maptype": "point_size"
+        },
+        {
+          "data_attributes": "AANT_MAN",
+          "unit": " male inhabitants",
+          "name": "Number of Males",
+          "maptype": "point_size"
+        },
+        {
+          "data_attributes": "AANT_VROUW",
+          "unit": " female inhabitants",
+          "name": "Number of Females",
+          "maptype": "point_size"
+        },
+        {
+          "data_attributes": "P_00_14_JR",
+          "unit": "% of total population",
+          "name": "% 0-14",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_15_24_JR",
+          "unit": "% of total population",
+          "name": "% age 15-24",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_25_44_JR",
+          "unit": "% of total population",
+          "name": "% age 25-44",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_45_64_JR",
+          "unit": "% of total population",
+          "name": "% age 45-64",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_65_EO_JR",
+          "unit": "% of total population",
+          "name": "% age 65 and older",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "AANTAL_HH",
+          "unit": " households",
+          "name": "Number of households",
+          "maptype": "point_size"
+        },
+        {
+          "data_attributes": "BEV_DICHTH",
+          "unit": " inhabitants per km2",
+          "name": "Population density",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_EENP_HH",
+          "unit": "% of households",
+          "name": "% one person households",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_HH_Z_K",
+          "unit": "% of households",
+          "name": "% households without children",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_HH_M_K",
+          "unit": "% of households",
+          "name": "% households with children",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "GEM_HH_GR",
+          "unit": " persons",
+          "name": "Average household size",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_WEST_AL",
+          "unit": "% of total population",
+          "name": "% western foreigners",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_N_W_AL",
+          "unit": "% of total population",
+          "name": "% non-western foreigners",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_MAROKKO",
+          "unit": "% of total population",
+          "name": "% Moroccons",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_ANT_ARU",
+          "unit": "% of total population",
+          "name": "% Antilians and Arubans",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_SURINAM",
+          "unit": "% of total population",
+          "name": "% Surinams",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_TURKIJE",
+          "unit": "% of total population",
+          "name": "% Turks",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "P_OVER_NW",
+          "unit": "% of total population",
+          "name": "% other non-western foreigners",
+          "maptype": "area_value"
+        },
+        {
+          "data_attributes": "OPP_TOT",
+          "unit": " ha.",
+          "name": "Area total",
+          "maptype": "point_size"
+        },
+        {
+          "data_attributes": "OPP_LAND",
+          "unit": " ha.",
+          "name": "Area land",
+          "maptype": "point_size"
+        },
+        {
+          "data_attributes": "OPP_WATER",
+          "unit": " ha.",
+          "name": "Area water",
+          "maptype": "point_size"
+        }
+      ]
+    },
+    {
+      "groupnum": "1",
+      "groupname": "Statistic Core Data per Province",
+      "groupDescription": "Provincial data aggregated from municipal data. The provincial borders are a union of the municipal borders as supplied by Kadaster.",
+      "date": "2011",
+      "defaultLabelAttribute": "prov_name",
+      "source": "Source: Statistics Netherlands (CBS)",
+      "//serviceType": "WFS",
+      "//serviceVersion": "1.1.0",
+      "//serviceURL": "http://geoserver.itc.nl/natatlas/spatialaggregator?",
+      "serviceType": "localfile",
+      "serviceURL": "./data/provincies/data.geojson",
+      "serviceTypeName": "gemeenten2provincies",
+      "serviceOutputFormat": "json",
+      "maps": [
+        {
+          "data_attributes": "id",
+          "unit": "",
+          "name": "Provincial code",
+          "maptype": "area_colour",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "min"
+        },
+        {
+          "data_attributes": "prov_name",
+          "unit": "",
+          "name": "Provincial name",
+          "maptype": "area_label",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "sum"
+        },
+        {
+          "data_attributes": "aant_inw",
+          "unit": " inhabitants",
+          "name": "Population",
+          "maptype": "point_size",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "round_avg"
+        },
+        {
+          "data_attributes": "aantal_hh",
+          "unit": " households",
+          "name": "Number of households",
+          "maptype": "point_size",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "sum"
+        },
+        {
+          "data_attributes": "bev_dichth",
+          "unit": " inhabitants per km2",
+          "name": "Population density",
+          "maptype": "area_value",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "round_avg"
+        },
+        {
+          "data_attributes": "gem_hh_gr",
+          "unit": " persons",
+          "name": "Average household size",
+          "maptype": "area_value",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "avg"
+        },
+        {
+          "data_attributes": "p_west_al",
+          "unit": "%",
+          "name": "% western foreigners",
+          "maptype": "area_value",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "round_avg"
+        },
+        {
+          "data_attributes": "p_n_w_al",
+          "unit": "%",
+          "name": "% non-western foreigners",
+          "maptype": "area_value",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "round_avg"
+        },
+        {
+          "data_attributes": "opp_tot",
+          "unit": " ha.",
+          "name": "Total area",
+          "maptype": "point_size",
+          "spatial_aggregation" : "union",
+          "attribute_aggregation": "sum"
+        }
+      ]
+    },
+    {
+      "groupnum": "2",
+      "groupname": "Natura2000 Protected Areas",
+      "groupDescription": "Natura 2000-areas consist of a combination of 77 Bird Protection areas and 142 EC Habitat Regulation areas as well as the protected nature conservation areas within. ",
+      "date": "2012",
+      "defaultLabelAttribute": "naam_n2k",
+      "source": "Source: Helpdesk PDOK",
+      "//serviceType": "WFS",
+      "//serviceURL": "http://geodata.nationaalgeoregister.nl/natura2000/wfs?",
+      "serviceType": "localfile",
+      "serviceURL": "./data/natura2000/data.geojson",
+      "serviceTypeName": "natura2000:natura2000",
+      "serviceOutputFormat": "json",
+      "serviceVersion": "1.1.0",
+      "maps": [
+        {
+          "data_attributes": "naam_n2k",
+          "unit": "",
+          "name": "Name protected area",
+          "maptype": "area_label"
+        },
+        {
+          "data_attributes": "status",
+          "unit": "",
+          "name": "Status protected area",
+          "maptype": "area_colour"
+        },
+        {
+          "data_attributes": "area",
+          "unit": " m2",
+          "name": "Size protected area",
+          "maptype": "point_size",
+          "bgColor": "#ffffff"
+        }
+      ]
+    }
+  ]
+}
