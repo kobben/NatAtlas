@@ -5,7 +5,7 @@
  *
  * @author Barend Köbben <b.j.kobben@utwente.nl>
  *
- * @version 0.5.0 [May 2015]
+ * @version 0.6.0 [Jul 2015]
  */
 
 body {
@@ -18,35 +18,31 @@ body {
 h1 {
     font-size: 14px;
 }
-
 h2 {
+    font-size: 12px;
+}
+h3 {
     font-size: 11px;
 }
-
-#menuDiv {
-    position: absolute;
-    left: 5px;
-    top: 5px;
-    width: 235px;
-    height: 245px;
-    padding: 4px;
-    overflow: auto;
-    border: 1px solid #cccccc;
-    background: #ffffff;
-    z-index: 1;
+h4 {
+    font-size: 10px;
+}
+.small {
+    font-size: 8px;
 }
 
 #chooserDiv {
     position: absolute;
     left: 5px;
     top: 5px;
-    width: 800px;
-    height: 600px;
+    width: 175px;
+    height: 245px;
     padding: 4px;
     overflow: auto;
     border: 1px solid #cccccc;
     background: #ffffff;
     z-index: 10;
+    opacity: 1;
 }
 
 .menushown {
@@ -57,11 +53,11 @@ h2 {
     display: none;
 }
 
-#infoDiv {
+#legendDiv {
     position: absolute;
     left: 5px;
     top: 260px;
-    width: 235px;
+    width: 175px;
     height: 390px;
     padding: 4px;
     overflow: auto;
@@ -72,13 +68,13 @@ h2 {
 
 #messageDiv {
     position: absolute;
-    left: 280px;
+    left: 180px;
     top: 325px;
-    width: 200px;
-    height: 30px;
+    width: 300px;
+    height: 60px;
     padding: 4px;
     overflow: hidden;
-    z-index: 0;
+    z-index: 100;
     text-align: center;
     border: 1px solid #000000;
     box-shadow: 5px 5px 15px #6a6a6a;
@@ -89,9 +85,9 @@ h2 {
     color: #ffffff;
 }
 
-#mapDiv {
+#mainMapDiv {
     position: absolute;
-    left: 248px;
+    left: 195px;
     top: 5px;
     width: 550px;
     height: 650px;
@@ -101,12 +97,43 @@ h2 {
     border: 1px solid #cccccc;
     background: #ccddf2;
 }
+#compareMapDiv {
+    position: absolute;
+    left: 755px;
+    top: 5px;
+    width: 550px;
+    height: 650px;
+    padding: 2px;
+    overflow: visible;
+    z-index: 2;
+    border: 1px solid #cccccc;
+    background: #ccddf2;
+    display: none;
+}
 
 .mapDiv .label {
     text-align: center;
     font-family: verdana, arial, sans-serif;
     fill: #ff0000;
     font-size: 5pt;
+}
+
+.defaultPolygons {
+    fill: #fffcd5;
+    stroke: #e4b1b1;
+    stroke-width: 0.3;
+}
+
+.defaultCircles, .mySizeLegend .swatch {
+    stroke: rgb(255, 255, 255);
+    stroke-width: 1;
+    fill: rgb(255, 0, 0);
+    fill-opacity: 0.6;
+}
+
+.myColorLegend .swatch {
+    stroke: #e4b1b1;
+    stroke-width: 0.3;
 }
 
 .nederland {
@@ -121,22 +148,15 @@ h2 {
     stroke-width: 0.2;
 }
 
-.circles {
-    stroke: rgb(255, 255, 255);
-    stroke-width: 1;
-    fill: rgb(255, 0, 0);
-    fill-opacity: 1;
-}
-
 .tooltip {
     position: absolute;
     z-index: 10;
     pointer-events: none;
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.85);
     border: 1px solid #ddd;
     padding: 5px 12px;
     border-radius: 5px;
-    box-shadow: 2px 2px 2px rgba(120, 120, 120, 0.55);
+    box-shadow: 2px 2px 2px rgba(120, 120, 120, 0.65);
     text-shadow: 0 1px 0 #eee;
 }
 

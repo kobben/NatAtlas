@@ -2,29 +2,33 @@
 <meta charset="utf-8">
 <head>
 
-    <title>National Atlas [0.5]</title>
+    <title>National Atlas [0.6]</title>
 
     <script src="./js/d3.v3.min.js"></script>
+    <script src="./js/d3-legend-bjk.js"></script>
     <script src="./js/colorbrewer.js"></script>
+    <script src="./js/topojson.min.js"></script>
+    <script src="./js/jenks.js"></script>
     <script src="./js/NatAtlas.js"></script>
 
     <link href='./css/colorbrewer.css' rel='stylesheet' type='text/css'/>
     <link href='./css/natatlas.css' rel='stylesheet' type='text/css'/>
+    <style>
+
+    </style>
 
 </head>
 
-
-<!-- init with  language = 1 = English -->
+<!-- init with language = 0 = Nederlands -->
 <body id="mainWindow" onload="init(1)">
-<div id="menuDiv">
-    <a href="index.html">NL </a>-- EN
+<div id="chooserDiv">
+    <a href="index.html">NL</a> -- EN
+
     <h1>CHOOSE SUBJECT...</h1>
 </div>
-<div id="mapDiv">
-    <div id="messageDiv">INITIALISING...</div>
-</div>
-<div id="infoDiv">
-    <div id="legendDiv"></div>
-</div>
+<div id="mainMapDiv"></div>
+<div id="compareMapDiv"></div>
+<div id="legendDiv"></div>
+<div id="messageDiv">STARTING UP...</div>
 
 </body>

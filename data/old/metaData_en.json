@@ -19,160 +19,160 @@
       "serviceURL": "./data/gemeenten/data.geojson",
       "serviceTypeName": "natatlas%3AWijkenBuurten2011%3AGemeenten_2011",
       "serviceOutputFormat": "json",
-      "maps": [
+      "mapsubjects": [
         {
-          "data_attributes": "GM_CODE",
-          "unit": "",
+          "attrib": "GM_CODE",
+          "data_unit": "",
           "name": "Municipality code",
           "maptype": "area_colour"
         },
         {
-          "data_attributes": "GM_NAAM",
-          "unit": "",
+          "attrib": "GM_NAAM",
+          "data_unit": "",
           "name": "Municipality name",
           "maptype": "area_label"
         },
         {
-          "data_attributes": "AANT_INW",
-          "unit": " inhabitants",
+          "attrib": "AANT_INW",
+          "data_unit": " inhabitants",
           "name": "Number of inhabitants",
           "maptype": "point_size"
         },
         {
-          "data_attributes": "AANT_MAN",
-          "unit": " male inhabitants",
+          "attrib": "AANT_MAN",
+          "data_unit": " male inhabitants",
           "name": "Number of Males",
           "maptype": "point_size"
         },
         {
-          "data_attributes": "AANT_VROUW",
-          "unit": " female inhabitants",
+          "attrib": "AANT_VROUW",
+          "data_unit": " female inhabitants",
           "name": "Number of Females",
           "maptype": "point_size"
         },
         {
-          "data_attributes": "P_00_14_JR",
-          "unit": "% of total population",
+          "attrib": "P_00_14_JR",
+          "data_unit": "% of total population",
           "name": "% 0-14",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_15_24_JR",
-          "unit": "% of total population",
+          "attrib": "P_15_24_JR",
+          "data_unit": "% of total population",
           "name": "% age 15-24",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_25_44_JR",
-          "unit": "% of total population",
+          "attrib": "P_25_44_JR",
+          "data_unit": "% of total population",
           "name": "% age 25-44",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_45_64_JR",
-          "unit": "% of total population",
+          "attrib": "P_45_64_JR",
+          "data_unit": "% of total population",
           "name": "% age 45-64",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_65_EO_JR",
-          "unit": "% of total population",
+          "attrib": "P_65_EO_JR",
+          "data_unit": "% of total population",
           "name": "% age 65 and older",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "AANTAL_HH",
-          "unit": " households",
+          "attrib": "AANTAL_HH",
+          "data_unit": " households",
           "name": "Number of households",
           "maptype": "point_size"
         },
         {
-          "data_attributes": "BEV_DICHTH",
-          "unit": " inhabitants per km2",
+          "attrib": "BEV_DICHTH",
+          "data_unit": " inhabitants per km2",
           "name": "Population density",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_EENP_HH",
-          "unit": "% of households",
+          "attrib": "P_EENP_HH",
+          "data_unit": "% of households",
           "name": "% one person households",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_HH_Z_K",
-          "unit": "% of households",
+          "attrib": "P_HH_Z_K",
+          "data_unit": "% of households",
           "name": "% households without children",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_HH_M_K",
-          "unit": "% of households",
+          "attrib": "P_HH_M_K",
+          "data_unit": "% of households",
           "name": "% households with children",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "GEM_HH_GR",
-          "unit": " persons",
+          "attrib": "GEM_HH_GR",
+          "data_unit": " persons",
           "name": "Average household size",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_WEST_AL",
-          "unit": "% of total population",
+          "attrib": "P_WEST_AL",
+          "data_unit": "% of total population",
           "name": "% western foreigners",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_N_W_AL",
-          "unit": "% of total population",
+          "attrib": "P_N_W_AL",
+          "data_unit": "% of total population",
           "name": "% non-western foreigners",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_MAROKKO",
-          "unit": "% of total population",
+          "attrib": "P_MAROKKO",
+          "data_unit": "% of total population",
           "name": "% Moroccons",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_ANT_ARU",
-          "unit": "% of total population",
+          "attrib": "P_ANT_ARU",
+          "data_unit": "% of total population",
           "name": "% Antilians and Arubans",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_SURINAM",
-          "unit": "% of total population",
+          "attrib": "P_SURINAM",
+          "data_unit": "% of total population",
           "name": "% Surinams",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_TURKIJE",
-          "unit": "% of total population",
+          "attrib": "P_TURKIJE",
+          "data_unit": "% of total population",
           "name": "% Turks",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "P_OVER_NW",
-          "unit": "% of total population",
+          "attrib": "P_OVER_NW",
+          "data_unit": "% of total population",
           "name": "% other non-western foreigners",
           "maptype": "area_value"
         },
         {
-          "data_attributes": "OPP_TOT",
-          "unit": " ha.",
+          "attrib": "OPP_TOT",
+          "data_unit": " ha.",
           "name": "Area total",
           "maptype": "point_size"
         },
         {
-          "data_attributes": "OPP_LAND",
-          "unit": " ha.",
+          "attrib": "OPP_LAND",
+          "data_unit": " ha.",
           "name": "Area land",
           "maptype": "point_size"
         },
         {
-          "data_attributes": "OPP_WATER",
-          "unit": " ha.",
+          "attrib": "OPP_WATER",
+          "data_unit": " ha.",
           "name": "Area water",
           "maptype": "point_size"
         }
@@ -192,74 +192,74 @@
       "serviceURL": "./data/provincies/data.geojson",
       "serviceTypeName": "gemeenten2provincies",
       "serviceOutputFormat": "json",
-      "maps": [
+      "mapsubjects": [
         {
-          "data_attributes": "id",
-          "unit": "",
+          "attrib": "id",
+          "data_unit": "",
           "name": "Provincial code",
           "maptype": "area_colour",
           "spatial_aggregation" : "union",
           "attribute_aggregation": "min"
         },
         {
-          "data_attributes": "prov_name",
-          "unit": "",
+          "attrib": "prov_name",
+          "data_unit": "",
           "name": "Provincial name",
           "maptype": "area_label",
           "spatial_aggregation" : "union",
           "attribute_aggregation": "sum"
         },
         {
-          "data_attributes": "aant_inw",
-          "unit": " inhabitants",
+          "attrib": "aant_inw",
+          "data_unit": " inhabitants",
           "name": "Population",
           "maptype": "point_size",
           "spatial_aggregation" : "union",
           "attribute_aggregation": "round_avg"
         },
         {
-          "data_attributes": "aantal_hh",
-          "unit": " households",
+          "attrib": "aantal_hh",
+          "data_unit": " households",
           "name": "Number of households",
           "maptype": "point_size",
           "spatial_aggregation" : "union",
           "attribute_aggregation": "sum"
         },
         {
-          "data_attributes": "bev_dichth",
-          "unit": " inhabitants per km2",
+          "attrib": "bev_dichth",
+          "data_unit": " inhabitants per km2",
           "name": "Population density",
           "maptype": "area_value",
           "spatial_aggregation" : "union",
           "attribute_aggregation": "round_avg"
         },
         {
-          "data_attributes": "gem_hh_gr",
-          "unit": " persons",
+          "attrib": "gem_hh_gr",
+          "data_unit": " persons",
           "name": "Average household size",
           "maptype": "area_value",
           "spatial_aggregation" : "union",
           "attribute_aggregation": "avg"
         },
         {
-          "data_attributes": "p_west_al",
-          "unit": "%",
+          "attrib": "p_west_al",
+          "data_unit": "%",
           "name": "% western foreigners",
           "maptype": "area_value",
           "spatial_aggregation" : "union",
           "attribute_aggregation": "round_avg"
         },
         {
-          "data_attributes": "p_n_w_al",
-          "unit": "%",
+          "attrib": "p_n_w_al",
+          "data_unit": "%",
           "name": "% non-western foreigners",
           "maptype": "area_value",
           "spatial_aggregation" : "union",
           "attribute_aggregation": "round_avg"
         },
         {
-          "data_attributes": "opp_tot",
-          "unit": " ha.",
+          "attrib": "opp_tot",
+          "data_unit": " ha.",
           "name": "Total area",
           "maptype": "point_size",
           "spatial_aggregation" : "union",
@@ -281,22 +281,22 @@
       "serviceTypeName": "natura2000:natura2000",
       "serviceOutputFormat": "json",
       "serviceVersion": "1.1.0",
-      "maps": [
+      "mapsubjects": [
         {
-          "data_attributes": "naam_n2k",
-          "unit": "",
+          "attrib": "naam_n2k",
+          "data_unit": "",
           "name": "Name protected area",
           "maptype": "area_label"
         },
         {
-          "data_attributes": "status",
-          "unit": "",
+          "attrib": "status",
+          "data_unit": "",
           "name": "Status protected area",
           "maptype": "area_colour"
         },
         {
-          "data_attributes": "area",
-          "unit": " m2",
+          "attrib": "area",
+          "data_unit": " m2",
           "name": "Size protected area",
           "maptype": "point_size",
           "bgColor": "#ffffff"
