@@ -3,9 +3,7 @@
 
     //BJK: addition/changed
     // legend.legendHeight() returns total height, for SVG height determination
-    // Barend Köbben b.j.kobben@utwente.nl 16 July 2015
-
-
+    // Barend Köbben b.j.kobben@utwente.nl 10 Aug 2015
 
     module.exports = function(){
 
@@ -434,8 +432,6 @@
             cell.transition().style("opacity", 1);
 
         }
-
-
 
         legend.scale = function(_) {
             if (!arguments.length) return legend;
