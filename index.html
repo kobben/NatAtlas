@@ -11,7 +11,6 @@
     <script src="./js/jenks.js"></script>
     <script src="./js/NatAtlas.js"></script>
 
-    <link href='./css/colorbrewer.css' rel='stylesheet' type='text/css'/>
     <link href='./css/natatlas.css' rel='stylesheet' type='text/css'/>
     <style>
     </style>
@@ -21,9 +20,20 @@
 <!-- init with language = 0 = Nederlands -->
 <body id="mainWindow" onload="init(0)">
 <div id="chooserDiv">
-    NL -- <a href="index_en.html">EN</a>
-
-    <h1>KIES ONDERWERP...</h1>
+    <input id="makeMapBtn" type="button" onclick="createMenuTree(MD)" value="KIES KAART..."> NL -- <a
+        href="index_en.html">EN</a>
+    <p>
+    <div id="mGroup"></div>
+    </p>
+    <p>
+    <div id="mSubject"></div>
+    </p>
+    <p>
+    <div id="mUnit"></div>
+    </p>
+    <p>
+    <div id="mDate"></div>
+    </p>
 </div>
 <div id="mainMapDiv"></div>
 <div id="compareMapDiv"></div>
