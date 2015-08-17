@@ -355,8 +355,6 @@ function chooseMap(mapgroup, mapsubject, mapunit, mapdate) {
         .style("width", "175px")
         .style("height", "20px")
     ;
-    document.getElementById("makeMapBtn").style.visibility = "visible";
-
 
     var geoData = undefined; // empty data layer
     var attribData = undefined; // empty attrib layer
