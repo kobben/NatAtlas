@@ -16,7 +16,6 @@
   "baseMapClassAttr": "name",
   "geo_sources": [
     {
-      "num": 0,
       "unitname": [
         "gemeente",
         "municipality"
@@ -37,7 +36,6 @@
       "serviceOutputFormat": "topojson"
     },
     {
-      "num": 1,
       "unitname": [
         "provincie",
         "province"
@@ -58,7 +56,6 @@
       "serviceOutputFormat": "topojson"
     },
     {
-      "num": 3,
       "unitname": [
         "gemeente",
         "municipality"
@@ -79,7 +76,6 @@
       "serviceOutputFormat": "geojson"
     },
     {
-      "num": 4,
       "unitname": [
         "Natura2000 Beschermde Gebieden",
         "Natura2000 Protected Areas"
@@ -95,15 +91,14 @@
         "Helpdesk PDOK"
       ],
       "serviceType": "localfile",
-      "serviceURL": "./data/natura2000/data.geojson",
+      "serviceURL": "./data/natura2000/geoandattribs.geojson",
       "serviceTypeName": "",
       "serviceOutputFormat": "geojson"
     }
   ],
   "attrib_sources": [
     {
-      "num": 0,
-      "name": "CBSGemeenten",
+      "name": "CBSGemeenten 2011",
       "description": [
         "Statistische kerncijfers gemeente (geselecteerd uit StatLine)",
         "Statistical key numbers municipality (selected from StatLine)"
@@ -120,8 +115,7 @@
       "serviceOutputFormat": "csv"
     },
     {
-      "num": 1,
-      "name": "CBSProvincies",
+      "name": "CBSProvincies 2011",
       "description": [
         "Statistische kerncijfers provincie (geselecteerd uit StatLine)",
         "Statistical key numbers province (selected from StatLine)"
@@ -138,8 +132,7 @@
       "serviceOutputFormat": "csv"
     },
     {
-      "num": 3,
-      "name": "CBSGemeenten",
+      "name": "CBSGemeenten 2013",
       "description": [
         "Statistische kerncijfers gemeente (geselecteerd uit StatLine)",
         "Statistical key numbers municipality (selected from StatLine)"
@@ -156,7 +149,6 @@
       "serviceOutputFormat": "csv"
     },
     {
-      "num": 4,
       "name": [
         "Natura2000 Beschermde Gebieden",
         "Natura2000 Protected Areas"
@@ -166,20 +158,79 @@
         "Natura 2000-areas consist of a combination of 77 Bird Protection areas and 142 EC Habitat Regulation areas as well as the protected nature conservation areas within."
       ],
       "date": "2012",
-      "FK_attrib": "naam_n2k",
+      "FK_attrib": "id",
       "source": [
         "Helpdesk PDOK",
         "Helpdesk PDOK"
       ],
       "serviceType": "localfile",
-      "serviceURL": "./data/natura2000/data.geojson",
+      "serviceURL": "./data/natura2000/geoandattribs.geojson",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "geojson"
+    },
+    {
+      "name": [
+        "Economische data per province 2012",
+        "Economic data per province 2012"
+      ],
+      "description": [
+        "Selectie uit Statline economische data.",
+        "Selected economic data from StatLine."
+      ],
+      "date": "2012",
+      "FK_attrib": "prov_code",
+      "source": [
+        "CBS StatLine",
+        "CBS StatLine"
+      ],
+      "serviceType": "localfile",
+      "serviceURL": "./data/provincies/economie.csv",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "csv"
+    },
+    {
+      "name": [
+        "Economische data per gemeente 2013",
+        "Economic data per municipality 2013"
+      ],
+      "description": [
+        "Selectie uit Statline economische data.",
+        "Selected economic data from StatLine."
+      ],
+      "date": "2013",
+      "FK_attrib": "GM_CODE",
+      "source": [
+        "CBS StatLine",
+        "CBS StatLine"
+      ],
+      "serviceType": "localfile",
+      "serviceURL": "./data/gemeenten/economie.csv",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "csv"
+    },
+    {
+      "name": [
+        "Natura2000 Beschermde Gebieden",
+        "Natura2000 Protected Areas"
+      ],
+      "description": [
+        "Natura2000 Beschermde Gebieden",
+        "Natura2000 Protected Areas"
+      ],
+      "date": "2012",
+      "FK_attrib": "id",
+      "source": [
+        "Helpdesk PDOK",
+        "Helpdesk PDOK"
+      ],
+      "serviceType": "localfile",
+      "serviceURL": "./data/natura2000/geoandattribs.geojson",
       "serviceTypeName": "",
       "serviceOutputFormat": "geojson"
     }
   ],
   "mapgroups": [
     {
-      "num": 0,
       "groupname": [
         "Bevolking",
         "Population"
@@ -190,7 +241,6 @@
       ],
       "mapsubjects": [
         {
-          "num": 0,
           "name": [
             "Aantal inwoners",
             "Number of inhabitants"
@@ -201,11 +251,12 @@
           ],
           "mapunits": [
             {
-              "num": 0,
-              "name": ["gemeente","municipality"],
+              "name": [
+                "gemeente",
+                "municipality"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 0,
                   "attrib_data": 0,
@@ -214,7 +265,6 @@
                   "label": "GM_NAAM"
                 },
                 {
-                  "num": 1,
                   "date": "2013",
                   "geo_data": 2,
                   "attrib_data": 2,
@@ -225,11 +275,12 @@
               ]
             },
             {
-              "num": 1,
-              "name": ["provincie","province"],
+              "name": [
+                "provincie",
+                "province"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 1,
                   "attrib_data": 1,
@@ -240,10 +291,13 @@
               ]
             }
           ],
-          "maptype": "point_size"
+          "maptype": "point_size",
+          "classification": {
+            "format": ".0f",
+            "colours": "rgb(255,0,0)"
+          }
         },
         {
-          "num": 1,
           "name": [
             "Aantal Mannen",
             "Number of Males"
@@ -254,11 +308,12 @@
           ],
           "mapunits": [
             {
-              "num": 0,
-              "name": ["gemeente","municipality"],
+              "name": [
+                "gemeente",
+                "municipality"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 0,
                   "attrib_data": 0,
@@ -269,10 +324,13 @@
               ]
             }
           ],
-          "maptype": "point_size"
+          "maptype": "point_size",
+          "classification": {
+            "format": ".0f",
+            "colours": "rgb(255,0,0)"
+          }
         },
         {
-          "num": 2,
           "name": [
             "Aantal Vrouwen",
             "Number of Females"
@@ -283,11 +341,12 @@
           ],
           "mapunits": [
             {
-              "num": 0,
-              "name": ["gemeente","municipality"],
+              "name": [
+                "gemeente",
+                "municipality"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 0,
                   "attrib_data": 0,
@@ -298,10 +357,13 @@
               ]
             }
           ],
-          "maptype": "point_size"
+          "maptype": "point_size",
+          "classification": {
+            "format": ".0f",
+            "colours": "rgb(0,0,255)"
+          }
         },
         {
-          "num": 3,
           "name": [
             "Bevolkingsdichtheid",
             "Population Density"
@@ -312,14 +374,22 @@
           ],
           "mapunits": [
             {
-              "num": 0,
-              "name": ["gemeente","municipality"],
+              "name": [
+                "gemeente",
+                "municipality"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 0,
                   "attrib_data": 0,
+                  "FK": "GM_CODE",
+                  "attrib": "BEV_DICHTH",
+                  "label": "GM_NAAM"
+                },{
+                  "date": "2013",
+                  "geo_data": 2,
+                  "attrib_data": 2,
                   "FK": "GM_CODE",
                   "attrib": "BEV_DICHTH",
                   "label": "GM_NAAM"
@@ -327,11 +397,12 @@
               ]
             },
             {
-              "num": 1,
-              "name": ["provincie","province"],
+              "name": [
+                "provincie",
+                "province"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 1,
                   "attrib_data": 1,
@@ -342,24 +413,66 @@
               ]
             }
           ],
-          "maptype": "area_value"
+          "maptype": "area_value",
+          "classification": {
+            "type": "manual",
+            "colours": "Greens",
+            "numclasses": "5",
+            "classes": [0,400,800,1600,3200,6400],
+            "format": ".0f"
+          }
         },
         {
-          "num": 4,
+          "name": [
+            "Eénpersoonshuishoudens",
+            "Single person households"
+          ],
+          "data_unit": [
+            "% van de huishoudens",
+            "% of households"
+          ],
+          "mapunits": [
+            {
+              "name": [
+                "gemeente",
+                "municipality"
+              ],
+              "mapdates": [
+                {
+                  "date": "2013",
+                  "geo_data": 2,
+                  "attrib_data": 2,
+                  "FK": "GM_CODE",
+                  "attrib": "P_EENP_HH",
+                  "label": "GM_NAAM"
+                }
+              ]
+            }
+          ],
+          "maptype": "area_value",
+          "classification": {
+            "type": "jenks",
+            "colours": "Oranges",
+            "format": ".0f"
+          }
+        },
+        {
           "name": [
             "CBS Code",
             "CBS Code"
           ],
           "data_unit": [
-            "",""
+            "",
+            ""
           ],
           "mapunits": [
             {
-              "num": 0,
-              "name": ["gemeente","municipality"],
+              "name": [
+                "gemeente",
+                "municipality"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 0,
                   "attrib_data": 0,
@@ -368,7 +481,6 @@
                   "label": "GM_NAAM"
                 },
                 {
-                  "num": 1,
                   "date": "2013",
                   "geo_data": 2,
                   "attrib_data": 2,
@@ -379,11 +491,12 @@
               ]
             },
             {
-              "num": 1,
-              "name": ["provincie","province"],
+              "name": [
+                "provincie",
+                "province"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 1,
                   "attrib_data": 1,
@@ -394,24 +507,28 @@
               ]
             }
           ],
-          "maptype": "area_colour"
+          "maptype": "area_colour",
+          "classification": {
+            "colours": "MaxColours"
+          }
         },
         {
-          "num": 5,
           "name": [
             "Provincienaam",
             "Province Name"
           ],
           "data_unit": [
-            "",""
+            "",
+            ""
           ],
           "mapunits": [
             {
-              "num": 0,
-              "name": ["provincie","province"],
+              "name": [
+                "provincie",
+                "province"
+              ],
               "mapdates": [
                 {
-                  "num": 0,
                   "date": "2011",
                   "geo_data": 1,
                   "attrib_data": 1,
@@ -422,7 +539,192 @@
               ]
             }
           ],
-          "maptype": "area_label"
+          "maptype": "area_label",
+          "classification": {}
+        }
+      ]
+    },
+    {
+      "groupname": [
+        "Economie",
+        "Economy"
+      ],
+      "groupDescription": [
+        "Kerncijfers over de economie.",
+        "Key numbers on the economy."
+      ],
+      "mapsubjects": [
+        {
+          "name": [
+            "Bruto Binnenlands Product",
+            "Gross Domestic Product"
+          ],
+          "data_unit": [
+            "Euro per inwoner",
+            "Euro per inhabitant"
+          ],
+          "mapunits": [
+            {
+              "name": [
+                "provincie",
+                "province"
+              ],
+              "mapdates": [
+                {
+                  "date": "2013",
+                  "geo_data": 1,
+                  "attrib_data": 4,
+                  "FK": "prov_code",
+                  "attrib": "bbp",
+                  "label": "prov_name"
+                }
+              ]
+            }
+          ],
+          "maptype": "area_value",
+          "classification": {
+            "type": "manual",
+            "numclasses": "5",
+            "classes": [
+              "dMin",
+              30000,
+              35000,
+              40000,
+              50000,
+              "dMax"
+            ],
+            "colours": "Reds",
+            "format": ".0f"
+          }
+        },
+        {
+          "name": [
+            "Totaal aan salarissen",
+            "Salaries total"
+          ],
+          "data_unit": [
+            "miljoen Euro",
+            "million Euro"
+          ],
+          "mapunits": [
+            {
+              "name": [
+                "provincie",
+                "province"
+              ],
+              "mapdates": [
+                {
+                  "date": "2012",
+                  "geo_data": 1,
+                  "attrib_data": 4,
+                  "FK": "prov_code",
+                  "attrib": "beloning",
+                  "label": "prov_name"
+                }
+              ]
+            }
+          ],
+          "maptype": "point_size",
+          "classification": {
+            "format": ".0f",
+            "colours": "rgb(255,0,0)"
+          }
+        },
+        {
+          "name": [
+            "Gemiddeld inkomen per inwoner",
+            "Average income per inhabitant"
+          ],
+          "data_unit": [
+            "duizend Euro",
+            "thousand Euro"
+          ],
+          "mapunits": [
+            {
+              "name": [
+                "gemeente",
+                "municipality"
+              ],
+              "mapdates": [
+                {
+                  "date": "2013",
+                  "geo_data": 2,
+                  "attrib_data": 5,
+                  "FK": "GM_CODE",
+                  "attrib": "g_ink_pi",
+                  "label": "gm_naam"
+                }
+              ]
+            },
+            {
+              "name": [
+                "provincie",
+                "province"
+              ],
+              "mapdates": [
+                {
+                  "date": "2012",
+                  "geo_data": 1,
+                  "attrib_data": 4,
+                  "FK": "prov_code",
+                  "attrib": "inkomen",
+                  "label": "prov_name"
+                }
+              ]
+            }
+          ],
+          "maptype": "area_value",
+          "classification": {
+            "type": "jenks",
+            "numclasses": "5",
+            "colours": "Greens",
+            "format": ".1f"
+          }
+        }
+      ]
+    }
+  ,
+    {
+      "groupname": [
+        "Natuur",
+        "Nature"
+      ],
+      "groupDescription": [
+        "Natuur",
+        "Nature"
+      ],
+      "mapsubjects": [
+        {
+          "name": [
+            "Beschermde gebieden",
+            "Protected areas"
+          ],
+          "data_unit": [
+            "Status",
+            "Status"
+          ],
+          "mapunits": [
+            {
+              "name": [
+                "Natura 2000 gebieden",
+                "Natura 2000 areas"
+              ],
+              "mapdates": [
+                {
+                  "date": "2012",
+                  "geo_data": 3,
+                  "attrib_data": 6,
+                  "FK": "id",
+                  "attrib": "status",
+                  "label": "naam_n2k"
+                }
+              ]
+            }
+          ],
+          "maptype": "area_colour",
+          "classification": {
+            "colours": "MaxColours"
+          }
         }
       ]
     }
