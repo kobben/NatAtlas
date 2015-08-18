@@ -255,11 +255,10 @@ function setMessage(messageStrs, messageType) {
 
 
 /**
- * Create map menus from metadata json object
- *
- * @param MD : the metadata JSON object
+ * Create map menus
+ * from MD = the global metadata object for maps
  */
-function showMapGroups(MD) {
+function showMapGroups() {
 
     hideCompareMap() ;
     //fold open div:
@@ -327,11 +326,11 @@ function showMapDates(mapGroup, mapSubject, mapUnit) {
         ;
     }
 }/**
- * Create comparemap menus from metadata json object
- *
- * @param MD : the metadata JSON object
+ * Create comparemap menus
+ * from MD = the global metadata object for maps to compare
+ * [for now the same as the main MD]
  */
-function showCompareGroups(MD) {
+function showCompareGroups() {
 
     showCompareMap() ;
     //fold open div:
@@ -389,7 +388,7 @@ function showCompareUnits(mapGroup, mapSubject) {
 function showCompareDates(mapGroup, mapSubject, mapUnit) {
 
     //clean up open menus:
-    d3.select("#mDate").selectAll("input").remove();
+    d3.select("#cDate").selectAll("input").remove();
     var mapDatesList = d3.select("#cDate");
     for (i = 0; i < MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits[mapUnit].mapdates.length; i++) {
         mapDatesList.append("input")
@@ -925,10 +924,12 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
             .transition().duration(1500)
+            .attr("class", "classedPolygon") //to avoid being treated as background!
             .style("fill", function (d) {
                 return dataStats.dClass2Colour(getAttribValue(d, attribData, mapAttrib, mapFK));
             })  // fill with result from classify function
         ;
+
 
     } else {
         setMessage(
