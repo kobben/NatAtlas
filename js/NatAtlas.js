@@ -6,7 +6,10 @@
  *
  * @author Barend Köbben - b.j.kobben@utwente.nl
  *
- * @version 0.6.0 [August 2015]
+ * @version 0.7.0 [August 2015]
+ * - Implementation of mapCompare tools
+ *
+ * earlier: 0.6.0 [August 2015]
  * - First attempt at new MapChooser
  * - repaired circles sizes to use Math.PI
  * - use object for dataStats
@@ -30,7 +33,7 @@ const NL = 0, EN = 1;
 const errorMsg = 0, showMsg = 1, hideMsg = 2, debugMsg = 3;
 // For now mapDiv fixed to 550x650 (here and in CSS style)
 // TODO: Make rescalable (responsive?)
-const mapDivHeight = 650, mapDivWidth = 550;
+const mapDivHeight = 590, mapDivWidth = 500;
 
 // global vars:
 var numClasses = 5;
@@ -38,14 +41,28 @@ var minCircleSize = 0;
 var maxCircleSize = 20;
 var mapgroup = -1, mapsubject = -1,
     mapunit = -1, mapdate = -1;
-var DEBUG, DEBUG1;
 var curLang;
 var mainMap, mainMapBG, compareMap, compareMapBG;
 var map_dims = {map_scale: 0.0, y_offset: 0.0, x_offset: 0.0};
-var legendDiv, messageDiv;
+var mainLegendDiv, compareLegendDiv, compareDiv, compareToolsDiv,messageDiv;
 var geo_path;
 var tooltip;
+var xSliderElem;
+var oSliderElem;
+var wSliderElem;
+var bCheckElem;
+var xScale = d3.scale.linear()
+    .range([135, 770])
+    .domain([0, 1]);
+var oScale = d3.scale.linear()
+    .range([0, 1])
+    .domain([0, 100]);
+var wScale = d3.scale.linear()
+    .range([0, 500])
+    .domain([0, 100]);
 
+
+var DEBUG;
 
 /**
  * INITIALISATION FUNCTION
@@ -68,6 +85,16 @@ function init(language) {
     }
     MD = undefined;
     messageDiv = document.getElementById("messageDiv");
+    mainLegendDiv = d3.select("#mainLegendDiv");
+    compareLegendDiv = d3.select("#compareLegendDiv");
+    compareDiv = d3.select("#compareDiv");
+    compareMapDiv = d3.select("#compareMapDiv");
+    compareToolsDiv= d3.select("#compareToolsDiv");
+
+    xSliderElem = document.getElementById("xSlider");
+    oSliderElem = document.getElementById("oSlider");
+    wSliderElem = document.getElementById("wSlider");
+    bCheckElem = document.getElementById("bCheck");
 
     // bootstrap MD json :
     d3.json(metadataURL,
@@ -120,7 +147,7 @@ function init(language) {
                 compareMapBG = compareMapSVG.append("g")
                     .attr("id", "compareMapBG")
                 ;
-                compareMap = mainMapSVG.append("g")
+                compareMap = compareMapSVG.append("g")
                     .attr("id", "compareMap")
                 ;
 
@@ -232,24 +259,20 @@ function setMessage(messageStrs, messageType) {
  *
  * @param MD : the metadata JSON object
  */
-function createMenuTree(MD) {
+function showMapGroups(MD) {
 
-    //document.getElementById("makeMapBtn").style.visibility = "hidden";
-
+    hideCompareMap() ;
     //fold open div:
     d3.select("#chooserDiv")
         .transition().duration(1000)
-        .style("width", "500px")
-        .style("height", "400px")
+        .style("width", "400px")
+        .style("height", "300px")
     ;
     //clean up open menus:
     d3.select("#mGroup").selectAll("input").remove();
     d3.select("#mSubject").selectAll("input").remove();
     d3.select("#mUnit").selectAll("input").remove();
     d3.select("#mDate").selectAll("input").remove();
-
-
-
     var mapGroupsList = d3.select("#mGroup");
     for (i = 0; i < MD.mapgroups.length; i++) {
         mapGroupsList.append("input")
@@ -303,6 +326,78 @@ function showMapDates(mapGroup, mapSubject, mapUnit) {
             .attr("onclick", "chooseMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ");")
         ;
     }
+}/**
+ * Create comparemap menus from metadata json object
+ *
+ * @param MD : the metadata JSON object
+ */
+function showCompareGroups(MD) {
+
+    showCompareMap() ;
+    //fold open div:
+    d3.select("#compareDiv")
+        .transition().duration(1000)
+        .style("width", "400px")
+        .style("height", "300px")
+    ;
+    //clean up open menus:
+    d3.select("#cGroup").selectAll("input").remove();
+    d3.select("#cSubject").selectAll("input").remove();
+    d3.select("#cUnit").selectAll("input").remove();
+    d3.select("#cDate").selectAll("input").remove();
+    var mapGroupsList = d3.select("#cGroup");
+    for (i = 0; i < MD.mapgroups.length; i++) {
+        mapGroupsList.append("input")
+            .attr("type", "button")
+            .attr("value", MD.mapgroups[i].groupname[curLang])
+            .attr("onclick", "showCompareSubjects(" + i + ");")
+        ;
+    }
+}
+
+function showCompareSubjects(mapGroup) {
+
+    //clean up open menus:
+    d3.select("#cSubject").selectAll("input").remove();
+    d3.select("#cUnit").selectAll("input").remove();
+    d3.select("#cDate").selectAll("input").remove();
+    var mapSubjectsList = d3.select("#cSubject");
+    for (i = 0; i < MD.mapgroups[mapGroup].mapsubjects.length; i++) {
+        mapSubjectsList.append("input")
+            .attr("type", "button")
+            .attr("value", MD.mapgroups[mapGroup].mapsubjects[i].name[curLang])
+            .attr("onclick", "showCompareUnits(" + mapGroup + "," + i + ");")
+        ;
+    }
+}
+
+function showCompareUnits(mapGroup, mapSubject) {
+
+    //clean up open menus:
+    d3.select("#cUnit").selectAll("input").remove();
+    d3.select("#cDate").selectAll("input").remove();
+    var mapUnitsList = d3.select("#cUnit");
+    for (i = 0; i < MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits.length; i++) {
+        mapUnitsList.append("input")
+            .attr("type", "button")
+            .attr("value", MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits[i].name[curLang])
+            .attr("onclick", "showCompareDates(" + mapGroup + "," + mapSubject + "," + i + ");")
+        ;
+    }
+}
+
+function showCompareDates(mapGroup, mapSubject, mapUnit) {
+
+    //clean up open menus:
+    d3.select("#mDate").selectAll("input").remove();
+    var mapDatesList = d3.select("#cDate");
+    for (i = 0; i < MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits[mapUnit].mapdates.length; i++) {
+        mapDatesList.append("input")
+            .attr("type", "button")
+            .attr("value", MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits[mapUnit].mapdates[i].date)
+            .attr("onclick", "chooseCompareMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ");")
+        ;
+    }
 }
 
 /**
@@ -352,7 +447,7 @@ function chooseMap(mapgroup, mapsubject, mapunit, mapdate) {
     //fold down chooserDiv:
     d3.select("#chooserDiv")
         .transition().duration(250)
-        .style("width", "175px")
+        .style("width", "120px")
         .style("height", "20px")
     ;
 
@@ -446,6 +541,7 @@ function chooseMap(mapgroup, mapsubject, mapunit, mapdate) {
                     createMap(geoData, mainMap);
                     symboliseMap(geoData, attribData, FK, mainMap, mapgroup, mapsubject, mapunit, mapdate);
                     setMessage(["Kaart gemaakt.", "Created map."], hideMsg);
+                    showCompareMapBtn();
                 }); // geojson attrib_data loader
 
             } else if (attribMD.serviceOutputFormat == "csv") {
@@ -476,21 +572,181 @@ function chooseMap(mapgroup, mapsubject, mapunit, mapdate) {
                     createMap(geoData, mainMap);
                     symboliseMap(geoData, attribData, FK, mainMap, mapgroup, mapsubject, mapunit, mapdate);
                     setMessage(["Kaart gemaakt.", "Created map."], hideMsg);
+                    showCompareMapBtn();
                 }); // CSV attrib_data loader
 
             } else {
                 setMessage(["Ongeldig formaat [serviceOutputFormat = " + attribMD.serviceOutputFormat + "]",
                     "Invalid format [serviceOutputFormat = " + attribMD.serviceOutputFormat + "]"], errorMsg);
             }
-
-
-
         }); //geo_data loader
-
     } //if-else
-
-
 } // endfunction chooseMap()
+
+/**
+ * trigger mapmaking according to mapgroup/etc chosen in menu
+ *
+ * */
+function chooseCompareMap(mapgroup, mapsubject, mapunit, mapdate) {
+
+    //fold down compareDiv:
+    d3.select("#compareDiv")
+        .transition().duration(250)
+        .style("width", "120px")
+        .style("height", "20px")
+    ;
+    showCompareMap();
+
+    var geoData = undefined; // empty data layer
+    var attribData = undefined; // empty attrib layer
+
+    if (mapgroup == -1 || mapsubject == -1 || mapunit == -1 || mapdate == -1
+        || MD.mapgroups[mapgroup] == undefined
+        || MD.mapgroups[mapgroup].mapsubjects[mapsubject] == undefined
+        || MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit] == undefined
+        || MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate] == undefined) {
+        setMessage(
+            ["Geen metadata voor kaart [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]",
+                "No metadata for map [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]"
+            ], errorMsg);
+
+        return;
+    } else {
+
+        setMessage(["KAART MAKEN [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]...",
+                "CREATING MAP [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]..."],
+            showMsg);
+
+        // foreign key to link geo with attrib data
+        var FK = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].FK;
+
+        // geo_data loader:
+        try {
+            var geoMD = MD.geo_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].geo_data];
+            var geoURL = geoMD.serviceURL;
+        } catch (e) {
+            console.log(e);
+        }
+        setMessage(["", "Loading geodata; URL=" + geoURL], debugMsg);
+        d3.json(geoURL, function (error, json) {
+            if (error != undefined) {
+                if (error.status == undefined) { // it's not XMLHTTPrequest error}
+                    theError = error.name + ": " + error.message;
+                } else {
+                    theError = "HTTP " + error.status + "--" + error.statusText;
+                }
+                setMessage(["KAART LADEN MISLUKT!\nURL= " + geoURL + ";\nError: " + theError,
+                    "ERROR LOADING MAP!\nURL= " + geoURL + ";\nError: " + theError], errorMsg);
+                return;
+            }
+
+            if (geoMD.serviceOutputFormat == "geojson") {
+                geoData = json; //load data
+            } else if (geoMD.serviceOutputFormat == "topojson") {
+                geoData = topojson.feature(json, json.objects.geo);
+            } else {
+                setMessage(["Ongeldig formaat [serviceOutputFormat = " + geoMD.serviceOutputFormat + "]",
+                    "Invalid format [serviceOutputFormat = " + geoMD.serviceOutputFormat + "]"], errorMsg);
+            }
+
+            // attrib_data loader:
+            try {
+                var attribMD = MD.attrib_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].attrib_data];
+                var attribURL = attribMD.serviceURL;
+            } catch (e) {
+                console.log(e);
+            }
+            setMessage(["", "Loading attribute data; URL=" + attribURL], debugMsg);
+            if (attribMD.serviceOutputFormat == "geojson") {
+
+                d3.json(attribURL, function (error, json) {
+                    if (error != undefined) {
+                        if (error.status == undefined) { // it's not XMLHTTPrequest error}
+                            theError = error.name + ": " + error.message;
+                        } else {
+                            theError = "HTTP " + error.status + "--" + error.statusText;
+                        }
+                        setMessage(["LADEN ATTRIBUUTDATA MISLUKT!\nURL= " + attribURL + ";\nError: " + theError,
+                            "ERROR LOADING ATTRIBUTE DATA!\nURL= " + attribURL + ";\nError: " + theError], errorMsg);
+                        return;
+                    }
+
+                    //create a map using FK as key:
+                    attribData = d3.map();
+                    json.features.forEach(function (d,i) {
+                        var FKval = eval("d.properties." + FK);
+                        var valuesObj = d.properties;
+                        if (FKval == undefined || valuesObj == undefined) {
+                            setMessage(["Geen geldige FK. Check metadata!\nFK=" + FK + "; FKval=" + FKval,
+                                "No valid FK. Check metadata!\n(FK=" + FK + "; FKval=" + FKval], errorMsg);
+                        }
+                        attribData.set(FKval,valuesObj);
+                    });
+
+                    setMessage(["Kaartdata geladen.", "Map data loaded."], hideMsg);
+                    createMap(geoData, compareMap);
+                    symboliseMap(geoData, attribData, FK, compareMap, mapgroup, mapsubject, mapunit, mapdate);
+                    setMessage(["Kaart gemaakt.", "Created map."], hideMsg);
+                }); // geojson attrib_data loader
+
+            } else if (attribMD.serviceOutputFormat == "csv") {
+
+                d3.csv(attribURL, function (error, csv) {
+                    if (error != undefined) {
+                        if (error.status == undefined) { // it's not XMLHTTPrequest error}
+                            theError = error.name + ": " + error.message;
+                        } else {
+                            theError = "HTTP " + error.status + "--" + error.statusText;
+                        }
+                        setMessage(["LADEN ATTRIBUUTDATA MISLUKT!\nURL= " + attribURL + ";\nError: " + theError,
+                            "ERROR LOADING ATTRIBUTE DATA!\nURL= " + attribURL + ";\nError: " + theError], errorMsg);
+                        return;
+                    }
+
+                    //create a map using FK as key:
+                    attribData = d3.map(csv, function (d) {
+                        var FKval = eval("d." + FK);
+                        if (FKval == undefined) {
+                            setMessage(["Geen geldige FK. Check metadata!\nFK=" + FK + "; FKval=" + FKval,
+                                "No valid FK. Check metadata!\n(FK=" + FK + "; FKval=" + FKval], errorMsg);
+                        }
+                        return FKval;
+                    });
+
+                    setMessage(["Kaartdata geladen.", "Map data loaded."], hideMsg);
+                    createMap(geoData, compareMap);
+                    symboliseMap(geoData, attribData, FK, compareMap, mapgroup, mapsubject, mapunit, mapdate);
+                    setMessage(["Kaart gemaakt.", "Created map."], hideMsg);
+                }); // CSV attrib_data loader
+
+            } else {
+                setMessage(["Ongeldig formaat [serviceOutputFormat = " + attribMD.serviceOutputFormat + "]",
+                    "Invalid format [serviceOutputFormat = " + attribMD.serviceOutputFormat + "]"], errorMsg);
+            }
+        }); //geo_data loader
+    } //if-else
+} // endfunction chooseCompareMap()
+
+
+function showCompareMapBtn() {
+    compareDiv.style("display", "inline");
+}
+
+function showCompareMap() {
+    compareDiv.style("display", "inline");
+    compareLegendDiv.style("display", "inline");
+    compareMapDiv.style("display", "inline");
+    compareToolsDiv.style("display", "inline");
+}
+
+function hideCompareMap() {
+    compareDiv.style("display", "none");
+    compareMap.selectAll("*").remove();
+    compareLegendDiv.style("display", "none");
+    compareLegendDiv.selectAll("*").remove();
+    compareMapDiv.style("display", "none");
+    compareToolsDiv.style("display", "none");
+}
 
 /**
  * Creates an empty map with polygon, point and label placeholders
@@ -498,6 +754,7 @@ function chooseMap(mapgroup, mapsubject, mapunit, mapdate) {
 function createMap(geoData, mapLayer) {
 
     // first delete existing map, if any:
+    DEBUG = mapLayer;
     mapLayer.selectAll("*").remove();
 
     // make polygons:
@@ -679,7 +936,11 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
     }
 
     setMessage(["", "Created map symbolisation."], debugMsg);
-    makeLegend(mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassification, dataStats);
+    if (mapLayer == mainMap) {
+        makeLegend(mainLegendDiv, mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassification, dataStats);
+    } else {
+        makeLegend(compareLegendDiv, mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassification, dataStats);
+    }
 }
 
 function getAttribValue(d, attribData, mapAttrib, mapFK) {
@@ -699,11 +960,10 @@ function getAttribValue(d, attribData, mapAttrib, mapFK) {
  * update legendDiv according to mapgroup/map chosen in menu
  *
  */
-function makeLegend(mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassification, dataStats) {
+function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassification, dataStats) {
 
     var geoSourceStr = ["Geodata", "Geodata"];
     var dataSourceStr = ["Attribuut data", "Attribute data"];
-    var legendDiv = d3.select("#legendDiv");
     var mapObj = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate];
 
     var legendHeader = "<h3>" + MD.mapgroups[mapgroup].groupname[curLang] + "</h3>";
@@ -713,12 +973,12 @@ function makeLegend(mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassifi
     }
     legendHeader += "(" + mapObj.date + ")</h4>";
     if (MD.mapgroups[mapgroup].mapsubjects[mapsubject].data_unit[curLang] != "") {
-        legendHeader += MD.mapgroups[mapgroup].mapsubjects[mapsubject].data_unit[curLang] + ":";
+        legendHeader += "<span>" + MD.mapgroups[mapgroup].mapsubjects[mapsubject].data_unit[curLang] + ":</span>";
     }
 
-    legendDiv.html(legendHeader);
+    whichLegend.html(legendHeader);
 
-    var legendSVG = legendDiv.append("svg")
+    var legendSVG = whichLegend.append("svg")
             .attr("id", "legendSVG")
             .attr("width", "100%")
             .attr("height", "100%")
@@ -807,7 +1067,7 @@ function makeLegend(mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassifi
     //legendFooter += MD.atlasName[curLang] + " (" + MD.atlasVersion + ") -- ";
     legendFooter += MD.atlasCopyright[curLang] + "</i></p>";
 
-    legendDiv.append("div").html(legendFooter);
+    whichLegend.append("div").html(legendFooter);
 
 }
 
@@ -969,4 +1229,42 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
 function InvalidClassMessage(Str) {
     setMessage(["ONGELDIGE CLASSIFICATIE!\n" + Str,
         "INVALID CLASSIFICATION!\n" + Str], errorMsg);
+}
+
+
+function xSlider() {
+    compareMapDiv.transition().duration(1000)
+        .style("left", xScale(xSliderElem.value)+"px" );
+    if (xScale(xSliderElem.value) == 135) {
+        oSliderElem.disabled = false;
+        wSliderElem.disabled = false;
+    } else {
+        oSliderElem.value = 100;
+        compareMapDiv.style("opacity", 1 );
+        oSliderElem.disabled = true;
+        wSliderElem.value = 100;
+        compareMapDiv.style("width", "500px" );
+        wSliderElem.disabled = true;
+        bCheckElem.checked = true;
+        compareMapBG.style("display", "inline");
+        compareMapDiv.style("background", "#ccddf2");
+        compareMap.selectAll(".defaultPolygons").style("fill","#fffcd5");
+    }
+}
+function wSlider() {
+    compareMapDiv.style("width", wScale(wSliderElem.value)+"px" );
+}
+function oSlider() {
+    compareMapDiv.style("opacity", oScale(oSliderElem.value) );
+}
+function bCheck() {
+    if (bCheckElem.checked) {
+        compareMapBG.style("display", "inline");
+        compareMapDiv.style("background", "#ccddf2");
+        compareMap.selectAll(".defaultPolygons").style("fill","#fffcd5");
+    } else {
+        compareMapBG.style("display", "none");
+        compareMapDiv.style("background", "none");
+        compareMap.selectAll(".defaultPolygons").style("fill","none");
+    }
 }

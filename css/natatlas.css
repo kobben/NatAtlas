@@ -35,14 +35,28 @@ h4 {
     position: absolute;
     left: 5px;
     top: 5px;
-    width: 175px;
-    height: 245px;
+    width: 120px;
+    height: 20px;
     padding: 4px;
-    overflow: auto;
+    overflow: hidden;
     border: 1px solid #cccccc;
     background: #ffffff;
     z-index: 10;
     opacity: 1;
+}
+#compareDiv {
+    position: absolute;
+    left: 640px;
+    top: 5px;
+    width: 120px;
+    height: 20px;
+    padding: 4px;
+    overflow: hidden;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    z-index: 9;
+    opacity: 1;
+    display: none;
 }
 
 .menushown {
@@ -53,17 +67,30 @@ h4 {
     display: none;
 }
 
-#legendDiv {
+#mainLegendDiv {
     position: absolute;
     left: 5px;
-    top: 260px;
-    width: 175px;
-    height: 390px;
+    top: 35px;
+    width: 120px;
+    height: 555px;
     padding: 4px;
     overflow: auto;
     z-index: 3;
     border: 1px solid #cccccc;
     background: #ffffff;
+}
+#compareLegendDiv {
+    position: absolute;
+    left: 640px;
+    top: 35px;
+    width: 120px;
+    height: 555px;
+    padding: 4px;
+    overflow: auto;
+    z-index: 3;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    display: none;
 }
 
 #messageDiv {
@@ -87,10 +114,10 @@ h4 {
 
 #mainMapDiv {
     position: absolute;
-    left: 195px;
+    left: 135px;
     top: 5px;
-    width: 550px;
-    height: 650px;
+    width: 500px;
+    height: 590px;
     padding: 2px;
     overflow: visible;
     z-index: 1;
@@ -99,15 +126,28 @@ h4 {
 }
 #compareMapDiv {
     position: absolute;
-    left: 755px;
+    left: 770px;
     top: 5px;
-    width: 550px;
-    height: 650px;
+    width: 500px;
+    height: 590px;
     padding: 2px;
-    overflow: visible;
+    overflow: hidden;
     z-index: 2;
     border: 1px solid #cccccc;
     background: #ccddf2;
+    display: none;
+}
+#compareToolsDiv {
+    position: absolute;
+    left: 135px;
+    top: 600px;
+    width: 500px;
+    height: 50px;
+    padding: 2px;
+    overflow: hidden;
+    z-index: 2;
+    border: 1px solid #cccccc;
+    background: #ffffff;
     display: none;
 }
 

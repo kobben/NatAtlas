@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <head>
 
-    <title>National Atlas [0.6]</title>
+    <title>National Atlas [0.7]</title>
 
     <script src="./js/d3.v3.min.js"></script>
     <script src="./js/d3-legend-bjk.js"></script>
@@ -21,23 +21,53 @@
 <!-- init with language = 0 = Nederlands -->
 <body id="mainWindow" onload="init(1)">
 <div id="chooserDiv">
-  <input  id="makeMapBtn" type="button" onclick="createMenuTree(MD)" value="CHOOSE MAP..." > <a href="index.html">NL</a> -- EN
-    <p>
+  <input  id="makeMapBtn" type="button" onclick="showMapGroups(MD)" value="CHOOSE MAP..." >
+    <p>Theme:<br>
     <div id="mGroup"></div>
     </p>
-    <p>
+    <p>Subject:<br>
     <div id="mSubject"></div>
     </p>
-    <p>
+    <p>Map Unit:<br>
     <div id="mUnit"></div>
     </p>
-    <p>
+    <p>Date:<br>
     <div id="mDate"></div>
+    </p>
+</div>
+<div id="compareDiv">
+    <input id="cMapBtn" type="button" onclick="showCompareGroups(MD)" value="COMPARE WITH...">
+    <p>Theme:<br>
+    <div id="cGroup"></div>
+    </p>
+    <p>Subject:<br>
+    <div id="cSubject"></div>
+    </p>
+    <p>Map Unit:<br>
+    <div id="cUnit"></div>
+    </p>
+    <p>Date:<br>
+    <div id="cDate"></div>
     </p>
 </div>
 <div id="mainMapDiv"></div>
 <div id="compareMapDiv"></div>
-<div id="legendDiv"></div>
+<div id="mainLegendDiv"></div>
+<div id="compareLegendDiv"></div>
+<div id="compareToolsDiv">
+    <table>
+        <tr align="center"><td>X-Position:</td><td>Opacity:</td><td>Swipe:</td><td>Background:</td></tr>
+        <tr align="center">
+            <td><input id="xSlider" type="range"  min="0" max="1" step="1" value="1" height="50px"
+                    oninput="xSlider()"/></td>
+        <td><input id="oSlider" type="range" disabled="disabled" min="0" max="100" step="1" value="100"
+                   oninput="oSlider()"/></td>
+        <td><input id="wSlider" type="range"  min="0" max="100" step="1" value="100"
+                   oninput="wSlider()"/></td>
+        <td><input id="bCheck" type="checkbox" checked onchange="bCheck()">Show</td>
+        </tr>
+    </table>
+</div>
 <div id="messageDiv">STARTING UP...</div>
 
 </body>
