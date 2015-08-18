@@ -835,7 +835,7 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
             .transition().duration(1000)
-            .attr("class", "defaultPolygons")  // add defaul// lt style (from css)
+            .attr("class", "defaultPolygons")  // add defaullt style from css
         ;
         // remove texts
         mapLayer.selectAll("text")   // select text nodes
@@ -874,6 +874,7 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
             .transition().duration(1500)
+            .attr("class", "classedPolygon") //to avoid being treated as background!
             .style("fill", function (d) {
                 // fill with result from classify function
                 return dataStats.dClass2Value(+getAttribValue(d, attribData, mapAttrib, mapFK));
