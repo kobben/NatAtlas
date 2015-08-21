@@ -26,14 +26,14 @@ var METADATA_URL;
 METADATA_URL = "./data/metaData.json";
 var MD; //global MetaDataObject
 
-// global constants:
-const VIEWER_VERSION = "0.6";
-const debugOn = true; //activates debugging message window
-const NL = 0, EN = 1;
-const errorMsg = 0, showMsg = 1, hideMsg = 2, debugMsg = 3;
+// global varants:
+var VIEWER_VERSION = "0.6";
+var debugOn = true; //activates debugging message window
+var NL = 0, EN = 1;
+var errorMsg = 0, showMsg = 1, hideMsg = 2, debugMsg = 3;
 // For now mapDiv fixed to 550x650 (here and in CSS style)
 // TODO: Make rescalable (responsive?)
-const mapDivHeight = 590, mapDivWidth = 500;
+var mapDivHeight = 590, mapDivWidth = 500;
 
 // global vars:
 var numClasses = 5;
@@ -192,7 +192,7 @@ function init(language) {
  * @param tx : X offset
  * @param ty : Y offset
  * @returns {{stream: Function}}
- * @constructor
+ * @varructor
  */
 function AffineTransformation(a, b, c, d, tx, ty) {
     return {
@@ -227,7 +227,7 @@ function AffineTransformation(a, b, c, d, tx, ty) {
  * Bi-lingual messaging system used for messages as well as errors and debug info
  *
  * @param messageStrs : array of messages [0=NL,1=EN]
- * @param messageType : const defining messageType (errorMsg,showMsg,hideMsg,debugMsg)
+ * @param messageType : var defining messageType (errorMsg,showMsg,hideMsg,debugMsg)
  */
 function setMessage(messageStrs, messageType) {
     //first some checking and if necessary repairing:
@@ -753,7 +753,6 @@ function hideCompareMap() {
 function createMap(geoData, mapLayer) {
 
     // first delete existing map, if any:
-    DEBUG = mapLayer;
     mapLayer.selectAll("*").remove();
 
     // make polygons:
@@ -835,7 +834,7 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
             .transition().duration(1000)
-            .attr("class", "defaultPolygons")  // add defaullt style from css
+            .attr("class", "defaultPolygons")  // add default style from css
         ;
         // remove texts
         mapLayer.selectAll("text")   // select text nodes
@@ -874,7 +873,7 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
             .transition().duration(1500)
-            .attr("class", "classedPolygon") //to avoid being treated as background!
+            .attr("class", "classedPolygons") //to avoid being treated as background!
             .style("fill", function (d) {
                 // fill with result from classify function
                 return dataStats.dClass2Value(+getAttribValue(d, attribData, mapAttrib, mapFK));
@@ -925,7 +924,7 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
             .transition().duration(1500)
-            .attr("class", "classedPolygon") //to avoid being treated as background!
+            .attr("class", "classedPolygons") //to avoid being treated as background!
             .style("fill", function (d) {
                 return dataStats.dClass2Colour(getAttribValue(d, attribData, mapAttrib, mapFK));
             })  // fill with result from classify function
