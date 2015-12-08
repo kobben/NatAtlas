@@ -2,57 +2,57 @@
 <meta charset="utf-8">
 <head>
 
-    <title>National Atlas [0.7]</title>
+    <title>National Atlas [0.8]</title>
 
     <script src="./js/d3.v3.min.js"></script>
     <script src="./js/d3-legend-bjk.js"></script>
     <script src="./js/colorbrewer.js"></script>
     <script src="./js/topojson.min.js"></script>
     <script src="./js/jenks.js"></script>
+    <script src="./js/Messages.js"></script>
+    <script src="./js/DataLoader.js"></script>
     <script src="./js/NatAtlas.js"></script>
 
     <link href='./css/natatlas.css' rel='stylesheet' type='text/css'/>
-    <style>
-
-    </style>
 
 </head>
 
-<!-- init with language = 0 = Nederlands -->
+<!-- init with language = 1 = english -->
 <body id="mainWindow" onload="init(1)">
 <div id="chooserDiv">
-  <input  id="makeMapBtn" type="button" onclick="showMapGroups(MD)" value="CHOOSE MAP..." >
+  <input  id="makeMapBtn" type="button" onclick="showMapGroups()" value="CHOOSE SUBJECT" >
     <p>Theme:<br>
-    <div id="mGroup"></div>
     </p>
+    <div id="mGroup"></div>
     <p>Subject:<br>
+    </p>
     <div id="mSubject"></div>
     </p>
     <p>Map Unit:<br>
-    <div id="mUnit"></div>
     </p>
+    <div id="mUnit"></div>
     <p>Date:<br>
     <div id="mDate"></div>
     </p>
 </div>
 <div id="compareDiv">
-    <input id="cMapBtn" type="button" onclick="showCompareGroups(MD)" value="COMPARE WITH...">
+    <input id="cMapBtn" type="button" onclick="showCompareGroups()" value="COMPARE WITH MAP">
     <p>Theme:<br>
+    </p>
     <div id="cGroup"></div>
-    </p>
     <p>Subject:<br>
+    </p>
     <div id="cSubject"></div>
-    </p>
     <p>Map Unit:<br>
+    </p>
     <div id="cUnit"></div>
-    </p>
     <p>Date:<br>
-    <div id="cDate"></div>
     </p>
+    <div id="cDate"></div>
 </div>
 <div id="mainMapDiv"></div>
 <div id="compareMapDiv"></div>
-<div id="mainLegendDiv"></div>
+<div id="mainLegendDiv"><a href="index.html">Nederlandse versie</a></div>
 <div id="compareLegendDiv"></div>
 <div id="compareToolsDiv">
     <table>
@@ -62,7 +62,7 @@
                     oninput="xSlider()"/></td>
         <td><input id="oSlider" type="range" disabled="disabled" min="0" max="100" step="1" value="100"
                    oninput="oSlider()"/></td>
-        <td><input id="wSlider" type="range"  min="0" max="100" step="1" value="100"
+        <td><input id="wSlider" type="range" disabled="disabled" min="0" max="100" step="1" value="100"
                    oninput="wSlider()"/></td>
         <td><input id="bCheck" type="checkbox" checked onchange="bCheck()">Show</td>
         </tr>

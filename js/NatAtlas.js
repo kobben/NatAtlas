@@ -6,45 +6,35 @@
  *
  * @author Barend Köbben - b.j.kobben@utwente.nl
  *
- * @version 0.7.0 [August 2015]
- * - Implementation of mapCompare tools
- *
- * earlier: 0.6.0 [August 2015]
- * - First attempt at new MapChooser
- * - repaired circles sizes to use Math.PI
- * - use object for dataStats
- * - Changed metadata to one file with several languages
- * - moved common styles to natatlas.css
- * - cleaned up all: clear distinction globals/locals/attributes
- * - more error checking in metadata loading
- * - added legends (based on d3.legend by Susie Lu: d3-legend.susielu.com)
- *
+ * @version 0.8 [December 2015]
+ * -- see ChangeList in README.md
  */
+
+
+var DEBUG,DEBUG1;
+
 
 // metadata as bootstrap, all other necessary data is in there:
 var METADATA_URL;
 METADATA_URL = "./data/metaData.json";
 var MD; //global MetaDataObject
 
-// global varants:
-var VIEWER_VERSION = "0.6";
+// global vars:
+var VIEWER_VERSION = "0.8";
 var debugOn = true; //activates debugging message window
 var NL = 0, EN = 1;
-var errorMsg = 0, showMsg = 1, hideMsg = 2, debugMsg = 3;
 // For now mapDiv fixed to 550x650 (here and in CSS style)
 // TODO: Make rescalable (responsive?)
 var mapDivHeight = 590, mapDivWidth = 500;
-
-// global vars:
+var mapVis = 0, graphVis = 1;
 var numClasses = 5;
 var minCircleSize = 0;
 var maxCircleSize = 20;
-var mapgroup = -1, mapsubject = -1,
-    mapunit = -1, mapdate = -1;
 var curLang;
 var mainMap, mainMapBG, compareMap, compareMapBG;
 var map_dims = {map_scale: 0.0, y_offset: 0.0, x_offset: 0.0};
-var mainLegendDiv, compareLegendDiv, compareDiv, compareToolsDiv,messageDiv;
+var mainLegendDiv, compareLegendDiv, compareDiv, compareToolsDiv,
+    compareMapDiv, compareToolsDiv, messageDiv;
 var geo_path;
 var tooltip;
 var xSliderElem;
@@ -62,7 +52,6 @@ var wScale = d3.scale.linear()
     .domain([0, 100]);
 
 
-var DEBUG;
 
 /**
  * INITIALISATION FUNCTION
@@ -84,7 +73,12 @@ function init(language) {
         alert("Invalid startup language in initialisation [" + language + "]")
     }
     MD = undefined;
+
+
     messageDiv = document.getElementById("messageDiv");
+    Messages.init(messageDiv,curLang);
+
+
     mainLegendDiv = d3.select("#mainLegendDiv");
     compareLegendDiv = d3.select("#compareLegendDiv");
     compareDiv = d3.select("#compareDiv");
@@ -107,10 +101,10 @@ function init(language) {
                 } else {
                     theError = "HTTP " + error.status + "--" + error.statusText;
                 }
-                setMessage([
+                Messages.setMessage([
                     "BOOTSTRAP MISLUKT: Laden MetaData mislukt\nURL= " + metadataURL + "\n" + theError,
                     "BOOTSTRAP FAILED: Error loading MetaData\nURL= " + metadataURL + "\n" + theError
-                ], errorMsg);
+                ], Messages.errorMsg);
             } else {
                 MD = json; //make global
                 // use RD projection limits to calculate scale and bounds needed for
@@ -160,8 +154,9 @@ function init(language) {
 
                 // load background maps from basemap data and render it
                 // using the attrib baseMapClassAttr as a class name
-                createBackgroundMap(mainMapBG, MD.baseMapDataURL, MD.baseMapClassAttr);
-                createBackgroundMap(compareMapBG, MD.baseMapDataURL, MD.baseMapClassAttr);
+                createBackgroundMap(mainMapBG, MD.baseMapDataFormat, MD.baseMapDataURL, MD.baseMapClassAttr);
+                createBackgroundMap(compareMapBG, MD.baseMapDataFormat, MD.baseMapDataURL, MD.baseMapClassAttr);
+
             }
         });
 
@@ -221,38 +216,6 @@ function AffineTransformation(a, b, c, d, tx, ty) {
         }
     };
 }
-
-
-/**
- * Bi-lingual messaging system used for messages as well as errors and debug info
- *
- * @param messageStrs : array of messages [0=NL,1=EN]
- * @param messageType : var defining messageType (errorMsg,showMsg,hideMsg,debugMsg)
- */
-function setMessage(messageStrs, messageType) {
-    //first some checking and if necessary repairing:
-    if (messageStrs.length == 0) {
-        //no message:
-        messageStrs[0] = messageStrs[1] = "No message supplied to SetMessage!";
-    } else if ((messageStrs.length == 1)) {
-        //only one language supplied, copy to other language:
-        messageStrs[1] = messageStrs[0];
-    }
-    if (messageType == showMsg) { //log message and display message box
-        messageDiv.innerHTML = messageStrs[curLang];
-        messageDiv.style.display = "inline"
-    } else if (messageType == hideMsg) { //log message and hide messagebox
-        messageDiv.innerHTML = messageStrs[curLang];
-        messageDiv.style.display = "none"
-    } else if (messageType == errorMsg) { //display Javascript alert
-        alert(messageStrs[curLang]);
-    }
-    if (debugOn) { // all messageTypes are logged in console:
-        // debug messages only in english
-        console.log(messageStrs[EN]);
-    }
-}
-
 
 /**
  * Create map menus
@@ -322,13 +285,17 @@ function showMapDates(mapGroup, mapSubject, mapUnit) {
         mapDatesList.append("input")
             .attr("type", "button")
             .attr("value", MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits[mapUnit].mapdates[i].date)
-            .attr("onclick", "chooseMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ");")
+            .attr("onclick", "createMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ");")
         ;
     }
-}/**
+}
+
+
+
+/**
  * Create comparemap menus
  * from MD = the global metadata object for maps to compare
- * [for now the same as the main MD]
+ * [TODO: for now the same as the main MD]
  */
 function showCompareGroups() {
 
@@ -394,54 +361,46 @@ function showCompareDates(mapGroup, mapSubject, mapUnit) {
         mapDatesList.append("input")
             .attr("type", "button")
             .attr("value", MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits[mapUnit].mapdates[i].date)
-            .attr("onclick", "chooseCompareMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ");")
+            .attr("onclick", "createCompareMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ");")
         ;
     }
 }
 
+
+
 /**
- * Create background layer
+ * Create background map layers
  *
  * @param URL : URL to metadata json
  * @param theClass : data attribute to use for CSS class name
  */
-function createBackgroundMap(mapLayer, URL, theClassAttr) {
-    setMessage(["ACHTERGRONDKAART LADEN...", "LOADING BACKGROUND MAP..."], showMsg);
-    setMessage(["", mapLayer[0][0].id + ": " + URL], debugMsg);
-    d3.json(
-        URL,
-        // inline call-back function
-        function (error, json) {
-            if (error != undefined) {
-                if (error.status == undefined) { // it's not XMLHTTPrequest error}
-                    theError = error.name + ": " + error.message;
-                } else {
-                    theError = "HTTP " + error.status + "--" + error.statusText;
-                }
-                setMessage(["ACHTERGRONDKAART LADEN MISLUKT!\nURL= " + URL + ";\nError: " + theError,
-                    "ERROR LOADING BACKGROUND MAP!\nURL= " + URL + ";\nError: " + theError], errorMsg);
-                return;
-            }
-
+function createBackgroundMap(mapLayer, theFormat, URL, theClassAttr) {
+    Messages.setMessage(["ACHTERGRONDKAART LADEN...", "LOADING BACKGROUND MAP..."], Messages.showMsg);
+    Messages.setMessage(["", mapLayer[0][0].id + ": " + URL], Messages.debugMsg);
+    DataLoader()
+        .geometries('BGMap', theFormat, URL)
+        .onload(function (dataLoaded) {
             // first make polygons:
             mapLayer.selectAll("path") // create path nodes
-                .data(json.features) // bind & join to features array
+                .data(dataLoaded.BGMap) // bind & join to features array
                 .enter().append("path") // for each create a new path
                 .attr("d", geo_path) // use special transformation stream initialised in init() for path data
                 .attr("class", function (d) {
                     return d3.map(d.properties).get(theClassAttr); //get class from data using the Attr
                 })
             ;
-            setMessage(["Achtergrondkaart geladen.", "Background Map loaded."], hideMsg);
-        });
+            Messages.setMessage(["Achtergrondkaart geladen.", "Background Map loaded."], Messages.hideMsg);
+            }
+        );
 }
 
 
 /**
  * trigger mapmaking according to mapgroup/etc chosen in menu
  *
- * */
-function chooseMap(mapgroup, mapsubject, mapunit, mapdate) {
+// * */
+
+function createMap(mapgroup, mapsubject, mapunit, mapdate) {
 
     //fold down chooserDiv:
     d3.select("#chooserDiv")
@@ -449,7 +408,6 @@ function chooseMap(mapgroup, mapsubject, mapunit, mapdate) {
         .style("width", "120px")
         .style("height", "20px")
     ;
-
     var geoData = undefined; // empty data layer
     var attribData = undefined; // empty attrib layer
 
@@ -458,135 +416,54 @@ function chooseMap(mapgroup, mapsubject, mapunit, mapdate) {
         || MD.mapgroups[mapgroup].mapsubjects[mapsubject] == undefined
         || MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit] == undefined
         || MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate] == undefined) {
-        setMessage(
+        Messages.setMessage(
             ["Geen metadata voor kaart [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]",
                 "No metadata for map [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]"
-            ], errorMsg);
+            ], Messages.errorMsg);
 
         return;
     } else {
 
-        setMessage(["KAART MAKEN [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]...",
+        Messages.setMessage(["KAART MAKEN [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]...",
                 "CREATING MAP [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]..."],
-            showMsg);
+            Messages.showMsg);
 
-        // foreign key to link geo with attrib data
-        var FK = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].FK;
-
-        // geo_data loader:
         try {
             var geoMD = MD.geo_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].geo_data];
             var geoURL = geoMD.serviceURL;
+            var attribMD = MD.attrib_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].attrib_data];
+            var attribURL = attribMD.serviceURL;
+            var FK = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].FK;
         } catch (e) {
             console.log(e);
         }
-        setMessage(["", "Loading geodata; URL=" + geoURL], debugMsg);
-        d3.json(geoURL, function (error, json) {
-            if (error != undefined) {
-                if (error.status == undefined) { // it's not XMLHTTPrequest error}
-                    theError = error.name + ": " + error.message;
-                } else {
-                    theError = "HTTP " + error.status + "--" + error.statusText;
+
+        Messages.setMessage(["", "Loading geodata; URL=" + geoURL], Messages.debugMsg);
+        Messages.setMessage(["", "Loading attribute data; URL=" + attribURL], Messages.debugMsg);
+
+        DataLoader()
+            .geometries('geoData', geoMD.serviceOutputFormat, geoURL)
+            .attributes('attribData', attribMD.serviceOutputFormat, attribURL, FK)
+            .onload(function (dataLoaded) {
+
+                Messages.setMessage(["Data geladen.", "Data loaded."], Messages.hideMsg);
+                createMapPlaceholders(dataLoaded.geoData, mainMap);
+                symboliseMap(dataLoaded.attribData, FK, mainMap, mapgroup, mapsubject, mapunit, mapdate);
+                Messages.setMessage(["Kaart gemaakt.", "Created map."], Messages.hideMsg);
+                showCompareBtn();
+
                 }
-                setMessage(["KAART LADEN MISLUKT!\nURL= " + geoURL + ";\nError: " + theError,
-                    "ERROR LOADING MAP!\nURL= " + geoURL + ";\nError: " + theError], errorMsg);
-                return;
-            }
+            );
 
-            if (geoMD.serviceOutputFormat == "geojson") {
-                geoData = json; //load data
-            } else if (geoMD.serviceOutputFormat == "topojson") {
-                geoData = topojson.feature(json, json.objects.geo);
-            } else {
-                setMessage(["Ongeldig formaat [serviceOutputFormat = " + geoMD.serviceOutputFormat + "]",
-                    "Invalid format [serviceOutputFormat = " + geoMD.serviceOutputFormat + "]"], errorMsg);
-            }
-
-            // attrib_data loader:
-            try {
-                var attribMD = MD.attrib_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].attrib_data];
-                var attribURL = attribMD.serviceURL;
-            } catch (e) {
-                console.log(e);
-            }
-            setMessage(["", "Loading attribute data; URL=" + attribURL], debugMsg);
-            if (attribMD.serviceOutputFormat == "geojson") {
-
-                d3.json(attribURL, function (error, json) {
-                    if (error != undefined) {
-                        if (error.status == undefined) { // it's not XMLHTTPrequest error}
-                            theError = error.name + ": " + error.message;
-                        } else {
-                            theError = "HTTP " + error.status + "--" + error.statusText;
-                        }
-                        setMessage(["LADEN ATTRIBUUTDATA MISLUKT!\nURL= " + attribURL + ";\nError: " + theError,
-                            "ERROR LOADING ATTRIBUTE DATA!\nURL= " + attribURL + ";\nError: " + theError], errorMsg);
-                        return;
-                    }
-
-                    //create a map using FK as key:
-                    attribData = d3.map();
-                    json.features.forEach(function (d,i) {
-                        var FKval = eval("d.properties." + FK);
-                        var valuesObj = d.properties;
-                        if (FKval == undefined || valuesObj == undefined) {
-                            setMessage(["Geen geldige FK. Check metadata!\nFK=" + FK + "; FKval=" + FKval,
-                                "No valid FK. Check metadata!\n(FK=" + FK + "; FKval=" + FKval], errorMsg);
-                        }
-                        attribData.set(FKval,valuesObj);
-                    });
-
-                    setMessage(["Kaartdata geladen.", "Map data loaded."], hideMsg);
-                    createMap(geoData, mainMap);
-                    symboliseMap(geoData, attribData, FK, mainMap, mapgroup, mapsubject, mapunit, mapdate);
-                    setMessage(["Kaart gemaakt.", "Created map."], hideMsg);
-                    showCompareMapBtn();
-                }); // geojson attrib_data loader
-
-            } else if (attribMD.serviceOutputFormat == "csv") {
-
-                d3.csv(attribURL, function (error, csv) {
-                    if (error != undefined) {
-                        if (error.status == undefined) { // it's not XMLHTTPrequest error}
-                            theError = error.name + ": " + error.message;
-                        } else {
-                            theError = "HTTP " + error.status + "--" + error.statusText;
-                        }
-                        setMessage(["LADEN ATTRIBUUTDATA MISLUKT!\nURL= " + attribURL + ";\nError: " + theError,
-                            "ERROR LOADING ATTRIBUTE DATA!\nURL= " + attribURL + ";\nError: " + theError], errorMsg);
-                        return;
-                    }
-
-                    //create a map using FK as key:
-                    attribData = d3.map(csv, function (d) {
-                        var FKval = eval("d." + FK);
-                        if (FKval == undefined) {
-                            setMessage(["Geen geldige FK. Check metadata!\nFK=" + FK + "; FKval=" + FKval,
-                                "No valid FK. Check metadata!\n(FK=" + FK + "; FKval=" + FKval], errorMsg);
-                        }
-                        return FKval;
-                    });
-
-                    setMessage(["Kaartdata geladen.", "Map data loaded."], hideMsg);
-                    createMap(geoData, mainMap);
-                    symboliseMap(geoData, attribData, FK, mainMap, mapgroup, mapsubject, mapunit, mapdate);
-                    setMessage(["Kaart gemaakt.", "Created map."], hideMsg);
-                    showCompareMapBtn();
-                }); // CSV attrib_data loader
-
-            } else {
-                setMessage(["Ongeldig formaat [serviceOutputFormat = " + attribMD.serviceOutputFormat + "]",
-                    "Invalid format [serviceOutputFormat = " + attribMD.serviceOutputFormat + "]"], errorMsg);
-            }
-        }); //geo_data loader
     } //if-else
-} // endfunction chooseMap()
+
+} // endfunction createMap()
 
 /**
  * trigger mapmaking according to mapgroup/etc chosen in menu
  *
  * */
-function chooseCompareMap(mapgroup, mapsubject, mapunit, mapdate) {
+function createCompareMap(mapgroup, mapsubject, mapunit, mapdate) {
 
     //fold down compareDiv:
     d3.select("#compareDiv")
@@ -604,130 +481,51 @@ function chooseCompareMap(mapgroup, mapsubject, mapunit, mapdate) {
         || MD.mapgroups[mapgroup].mapsubjects[mapsubject] == undefined
         || MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit] == undefined
         || MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate] == undefined) {
-        setMessage(
+        Messages.setMessage(
             ["Geen metadata voor kaart [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]",
                 "No metadata for map [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]"
-            ], errorMsg);
+            ], Messages.errorMsg);
 
         return;
     } else {
 
-        setMessage(["KAART MAKEN [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]...",
+        Messages.setMessage(["KAART MAKEN [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]...",
                 "CREATING MAP [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]..."],
-            showMsg);
+            Messages.showMsg);
 
-        // foreign key to link geo with attrib data
-        var FK = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].FK;
-
-        // geo_data loader:
         try {
             var geoMD = MD.geo_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].geo_data];
             var geoURL = geoMD.serviceURL;
+            var attribMD = MD.attrib_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].attrib_data];
+            var attribURL = attribMD.serviceURL;
+            var FK = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].FK;
         } catch (e) {
             console.log(e);
         }
-        setMessage(["", "Loading geodata; URL=" + geoURL], debugMsg);
-        d3.json(geoURL, function (error, json) {
-            if (error != undefined) {
-                if (error.status == undefined) { // it's not XMLHTTPrequest error}
-                    theError = error.name + ": " + error.message;
-                } else {
-                    theError = "HTTP " + error.status + "--" + error.statusText;
+
+        Messages.setMessage(["", "Loading geodata; URL=" + geoURL], Messages.debugMsg);
+        Messages.setMessage(["", "Loading attribute data; URL=" + attribURL], Messages.debugMsg);
+
+        DataLoader()
+            .geometries('geoData', geoMD.serviceOutputFormat, geoURL)
+            .attributes('attribData', attribMD.serviceOutputFormat, attribURL, FK)
+            .onload(function (dataLoaded) {
+
+                    Messages.setMessage(["Data geladen.", "Data loaded."], Messages.hideMsg);
+                    createMapPlaceholders(dataLoaded.geoData, compareMap);
+                    symboliseMap(dataLoaded.attribData, FK, compareMap, mapgroup, mapsubject, mapunit, mapdate);
+                    Messages.setMessage(["Kaart gemaakt.", "Created map."], Messages.hideMsg);
+                    showCompareBtn();
+
                 }
-                setMessage(["KAART LADEN MISLUKT!\nURL= " + geoURL + ";\nError: " + theError,
-                    "ERROR LOADING MAP!\nURL= " + geoURL + ";\nError: " + theError], errorMsg);
-                return;
-            }
+            );
 
-            if (geoMD.serviceOutputFormat == "geojson") {
-                geoData = json; //load data
-            } else if (geoMD.serviceOutputFormat == "topojson") {
-                geoData = topojson.feature(json, json.objects.geo);
-            } else {
-                setMessage(["Ongeldig formaat [serviceOutputFormat = " + geoMD.serviceOutputFormat + "]",
-                    "Invalid format [serviceOutputFormat = " + geoMD.serviceOutputFormat + "]"], errorMsg);
-            }
-
-            // attrib_data loader:
-            try {
-                var attribMD = MD.attrib_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].attrib_data];
-                var attribURL = attribMD.serviceURL;
-            } catch (e) {
-                console.log(e);
-            }
-            setMessage(["", "Loading attribute data; URL=" + attribURL], debugMsg);
-            if (attribMD.serviceOutputFormat == "geojson") {
-
-                d3.json(attribURL, function (error, json) {
-                    if (error != undefined) {
-                        if (error.status == undefined) { // it's not XMLHTTPrequest error}
-                            theError = error.name + ": " + error.message;
-                        } else {
-                            theError = "HTTP " + error.status + "--" + error.statusText;
-                        }
-                        setMessage(["LADEN ATTRIBUUTDATA MISLUKT!\nURL= " + attribURL + ";\nError: " + theError,
-                            "ERROR LOADING ATTRIBUTE DATA!\nURL= " + attribURL + ";\nError: " + theError], errorMsg);
-                        return;
-                    }
-
-                    //create a map using FK as key:
-                    attribData = d3.map();
-                    json.features.forEach(function (d,i) {
-                        var FKval = eval("d.properties." + FK);
-                        var valuesObj = d.properties;
-                        if (FKval == undefined || valuesObj == undefined) {
-                            setMessage(["Geen geldige FK. Check metadata!\nFK=" + FK + "; FKval=" + FKval,
-                                "No valid FK. Check metadata!\n(FK=" + FK + "; FKval=" + FKval], errorMsg);
-                        }
-                        attribData.set(FKval,valuesObj);
-                    });
-
-                    setMessage(["Kaartdata geladen.", "Map data loaded."], hideMsg);
-                    createMap(geoData, compareMap);
-                    symboliseMap(geoData, attribData, FK, compareMap, mapgroup, mapsubject, mapunit, mapdate);
-                    setMessage(["Kaart gemaakt.", "Created map."], hideMsg);
-                }); // geojson attrib_data loader
-
-            } else if (attribMD.serviceOutputFormat == "csv") {
-
-                d3.csv(attribURL, function (error, csv) {
-                    if (error != undefined) {
-                        if (error.status == undefined) { // it's not XMLHTTPrequest error}
-                            theError = error.name + ": " + error.message;
-                        } else {
-                            theError = "HTTP " + error.status + "--" + error.statusText;
-                        }
-                        setMessage(["LADEN ATTRIBUUTDATA MISLUKT!\nURL= " + attribURL + ";\nError: " + theError,
-                            "ERROR LOADING ATTRIBUTE DATA!\nURL= " + attribURL + ";\nError: " + theError], errorMsg);
-                        return;
-                    }
-
-                    //create a map using FK as key:
-                    attribData = d3.map(csv, function (d) {
-                        var FKval = eval("d." + FK);
-                        if (FKval == undefined) {
-                            setMessage(["Geen geldige FK. Check metadata!\nFK=" + FK + "; FKval=" + FKval,
-                                "No valid FK. Check metadata!\n(FK=" + FK + "; FKval=" + FKval], errorMsg);
-                        }
-                        return FKval;
-                    });
-
-                    setMessage(["Kaartdata geladen.", "Map data loaded."], hideMsg);
-                    createMap(geoData, compareMap);
-                    symboliseMap(geoData, attribData, FK, compareMap, mapgroup, mapsubject, mapunit, mapdate);
-                    setMessage(["Kaart gemaakt.", "Created map."], hideMsg);
-                }); // CSV attrib_data loader
-
-            } else {
-                setMessage(["Ongeldig formaat [serviceOutputFormat = " + attribMD.serviceOutputFormat + "]",
-                    "Invalid format [serviceOutputFormat = " + attribMD.serviceOutputFormat + "]"], errorMsg);
-            }
-        }); //geo_data loader
     } //if-else
-} // endfunction chooseCompareMap()
+
+} // endfunction createCompareMap()
 
 
-function showCompareMapBtn() {
+function showCompareBtn() {
     compareDiv.style("display", "inline");
 }
 
@@ -750,14 +548,14 @@ function hideCompareMap() {
 /**
  * Creates an empty map with polygon, point and label placeholders
  */
-function createMap(geoData, mapLayer) {
+function createMapPlaceholders(geoData, mapLayer) {
 
     // first delete existing map, if any:
     mapLayer.selectAll("*").remove();
 
     // make polygons:
     mapLayer.selectAll("path")  // select path nodes
-        .data(geoData.features)   // bind and join these to features in json
+        .data(geoData)   // bind and join these to features in json
         .enter().append("path")   // for each create a new path
         .attr("d", geo_path)      // transform supplied json geo to svg "d"
         .attr("class", "defaultPolygons")   // for now all same fill-stroke (from css)
@@ -770,7 +568,7 @@ function createMap(geoData, mapLayer) {
     ;
     // create proportional circles on top:
     mapLayer.selectAll("circle")  // select circle nodes
-        .data(geoData.features)    // bind and join these to the features array in json
+        .data(geoData)    // bind and join these to the features array in json
         .enter().append("circle")  // for each create a new circle
         .attr("cx", function (d) {
             return x = Math.round(geo_path.centroid(d)[0]);
@@ -789,7 +587,7 @@ function createMap(geoData, mapLayer) {
     ;
     // create empty text items:
     mapLayer.selectAll("text") // select text nodes
-        .data(geoData.features)  // bind and join these to the features array in json
+        .data(geoData)  // bind and join these to the features array in json
         .enter().append("text")  // for each create a new text object
         .text("")
         .attr("class", "label")
@@ -815,7 +613,7 @@ function createMap(geoData, mapLayer) {
 /**
  * Sets point size, polygon fill and/or label text of map based on data chosen
  */
-function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, mapunit, mapdate) {
+function symboliseMap(attribData, FK, mapLayer, mapgroup, mapsubject, mapunit, mapdate) {
 
     var mapType = MD.mapgroups[mapgroup].mapsubjects[mapsubject].maptype;
     var mapAttrib = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].attrib;
@@ -840,9 +638,16 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
         mapLayer.selectAll("text")   // select text nodes
             .text("")
         ;
-        // change proportional circles sizes:
+        //determine colour to use:
+        var myCol;
+        if (mapLayer == mainMap) {
+            myCol = mapClassification.colours[0];
+        } else {
+            myCol = mapClassification.colours[1];
+        }
+        // change proportional circles sizes (and maybe colour):
         mapLayer.selectAll("circle")   // select again all the current circle nodes
-            .style("fill", mapClassification.colours)
+            .style("fill", myCol)
             .on("mouseenter", function (d) {
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
@@ -932,11 +737,11 @@ function symboliseMap(geoData, attribData, FK, mapLayer, mapgroup, mapsubject, m
 
 
     } else {
-        setMessage(
-            ["Onbekend Map Type [" + mapType + "]", "Unknown Map Type [" + mapType + "]"], errorMsg);
+        Messages.setMessage(
+            ["Onbekend Map Type [" + mapType + "]", "Unknown Map Type [" + mapType + "]"], Messages.errorMsg);
     }
 
-    setMessage(["", "Created map symbolisation."], debugMsg);
+    Messages.setMessage(["", "Created map symbolisation."], Messages.debugMsg);
     if (mapLayer == mainMap) {
         makeLegend(mainLegendDiv, mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassification, dataStats);
     } else {
@@ -948,11 +753,11 @@ function getAttribValue(d, attribData, mapAttrib, mapFK) {
     var FKval = undefined;
     var attribValue = undefined;
     try {
-        FKval = eval("d.properties." + mapFK);
-        attribValue = eval("attribData.get(FKval)." + mapAttrib);
+        FKval = d.properties[mapFK];
+        attribValue = attribData.get(FKval)[mapAttrib];
     } catch (e) {
-        setMessage(["Fout in data!\nFK=" + FKval + "; attribuut=" + mapAttrib + "; waarde=" + attribValue,
-        "Error retrieving data!\n(FK=" + FKval + "; attribute=" + mapAttrib + "; value=" + attribValue], errorMsg);
+        Messages.setMessage(["Fout in data!\nFK=" + FKval + "; attribuut=" + mapAttrib + "; waarde=" + attribValue,
+        "Error retrieving data!\n(FK=" + FKval + "; attribute=" + mapAttrib + "; value=" + attribValue], Messages.errorMsg);
     }
     return attribValue;
 }
@@ -1008,7 +813,14 @@ function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType
         legendSVG.select(".mySizeLegend")
             .call(mySizeLegend)
         ;
-        legendSVG.selectAll("circle").style("fill", mapClassification.colours);
+        //determine colour to use:
+        var myCol;
+        if (whichLegend == mainLegendDiv) {
+            myCol = mapClassification.colours[0];
+        } else {
+            myCol = mapClassification.colours[1];
+        }
+        legendSVG.selectAll("circle").style("fill", myCol);
 
         legendSVG.style("height", mySizeLegend.legendHeight());
 
@@ -1057,8 +869,8 @@ function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType
         legendSVG.style("height", legend.legendHeight());
 
     } else {
-        setMessage(
-            ["Onbekend Map Type [" + mapType + "]", "Unknown Map Type [" + mapType + "]"], errorMsg);
+        Messages.setMessage(
+            ["Onbekend Map Type [" + mapType + "]", "Unknown Map Type [" + mapType + "]"], Messages.errorMsg);
     }
 
     var legendFooter = "<hr><p class='small'>" + geoSourceStr[curLang] + ": "
@@ -1112,12 +924,12 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
     var errorStr = "";
     attribData.forEach(function (k, v) {
         if (mapType == "point_size" || mapType == "area_value") {
-            myStats.dValues[i] = +eval("v." + attrib); //+ to force numerical
+            myStats.dValues[i] = + v[attrib]; //+ to force numerical
             if (myStats.dValues[i] == undefined || isNaN(myStats.dValues[i])) {
                 errorStr = "Maptype=" + mapType + "; data=" + myStats.dValues[i];
             }
         } else { //area_label or area_colour
-            myStats.dValues[i] = eval("v." + attrib);
+            myStats.dValues[i] = v[attrib];
             if (myStats.dValues[i] == undefined) {
                 errorStr = "Maptype=" + mapType + "; data=" + myStats.dValues[i];
             }
@@ -1125,8 +937,8 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
         i++;
     });
     if (errorStr != "") {
-        setMessage(["ONGELDIGE DATA VOOR DIT MAPTYPE!\n" + errorStr,
-            "INVALID DATA FOR THIS MAPTYPE!\n" + errorStr], errorMsg);
+        Messages.setMessage(["ONGELDIGE DATA VOOR DIT MAPTYPE!\n" + errorStr,
+            "INVALID DATA FOR THIS MAPTYPE!\n" + errorStr], Messages.errorMsg);
         console.log(myStats.dValues);
     }
 
@@ -1187,7 +999,7 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
         }
         // a classed scale for (choropleth) ordered or relative ratio maps:
         try {
-            var CBrange = eval("colorbrewer." + mapClassification.colours + "[" + mapClassification.numclasses + "]");
+            var CBrange = colorbrewer[mapClassification.colours][mapClassification.numclasses];
         } catch (e) {
             InvalidClassMessage(clStr + "\n'" + mapClassification.colours + "' is not a valid ColorBrewer name.");
         }
@@ -1210,7 +1022,7 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
             InvalidClassMessage(clStr + "\nInvalid numclasses (<3 or >24).");
         }
         try {
-            var CBrange = eval("colorbrewer." + mapClassification.colours + "[" + mapClassification.numclasses + "]");
+            var CBrange = colorbrewer[mapClassification.colours][mapClassification.numclasses];
         } catch (e) {
             InvalidClassMessage(clStr + "\n'" + mapClassification.colours + "' not valid ColorBrewer name, or no. of classes not available.");
         }
@@ -1218,18 +1030,18 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
             .range(CBrange)
 
     } else {
-        setMessage(
-            ["Onbekend Map Type [" + mapType + "]", "Unknown Map Type [" + mapType + "]"], errorMsg);
+        Messages.setMessage(
+            ["Onbekend Map Type [" + mapType + "]", "Unknown Map Type [" + mapType + "]"], Messages.errorMsg);
     }
 
-    setMessage(["", "Calculated map statistics."], debugMsg);
+    Messages.setMessage(["", "Calculated map statistics."], Messages.debugMsg);
     //if (debugOn) console.log(myStats);
     return myStats;
 }
 
 function InvalidClassMessage(Str) {
-    setMessage(["ONGELDIGE CLASSIFICATIE!\n" + Str,
-        "INVALID CLASSIFICATION!\n" + Str], errorMsg);
+    Messages.setMessage(["ONGELDIGE CLASSIFICATIE!\n" + Str,
+        "INVALID CLASSIFICATION!\n" + Str], Messages.errorMsg);
 }
 
 
