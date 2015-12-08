@@ -3,7 +3,7 @@
     "Nationale Atlas van Nederland",
     "National Atlas of The Netherlands"
   ],
-  "atlasVersion": "0.6",
+  "atlasVersion": "0.7",
   "atlasCopyright": [
     "©2011-15: Stichting Wetenschappelijke Atlas Nederland",
     "©2011-15: Foundation Scientific Atlas of the Netherlands"
@@ -13,6 +13,7 @@
     "English"
   ],
   "baseMapDataURL": "./data/basemap/data.geojson",
+  "baseMapDataFormat" : "geojson",
   "baseMapClassAttr": "name",
   "geo_sources": [
     {
@@ -85,7 +86,7 @@
         "Natura 2000-areas consist of a combination of 77 Bird Protection areas and 142 EC Habitat Regulation areas as well as the protected nature conservation areas within."
       ],
       "date": "2012",
-      "FK_attrib": "naam_n2k",
+      "FK_attrib": "id",
       "source": [
         "Helpdesk PDOK",
         "Helpdesk PDOK"
@@ -294,7 +295,7 @@
           "maptype": "point_size",
           "classification": {
             "format": ".0f",
-            "colours": "rgb(255,0,0)"
+            "colours": ["rgb(255,0,0)","rgb(0,0,255)"]
           }
         },
         {
@@ -365,7 +366,7 @@
         },
         {
           "name": [
-            "Bevolkingsdichtheid",
+            "Bevolkings-dichtheid",
             "Population Density"
           ],
           "data_unit": [

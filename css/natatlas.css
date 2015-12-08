@@ -48,7 +48,7 @@ h4 {
     position: absolute;
     left: 640px;
     top: 5px;
-    width: 120px;
+    width: 300px;
     height: 20px;
     padding: 4px;
     overflow: hidden;
@@ -124,6 +124,19 @@ h4 {
     border: 1px solid #cccccc;
     background: #ccddf2;
 }
+#compareGraphDiv {
+    position: absolute;
+    left: 640px;
+    top: 5px;
+    width: 500px;
+    height: 590px;
+    padding: 2px;
+    overflow: hidden;
+    z-index: 2;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    display: inline;
+}
 #compareMapDiv {
     position: absolute;
     left: 770px;
@@ -158,7 +171,7 @@ h4 {
     font-size: 5pt;
 }
 
-.defaultPolygons {
+.defaultPolygons, .classedPolygons {
     fill: #fffcd5;
     stroke: #e4b1b1;
     stroke-width: 0.3;
@@ -205,4 +218,26 @@ h4 {
     font-size: 10px;
     color: #000;
     margin-bottom: 3px;
+}
+
+.chart {
+    background-color: rgb(245,245,245);
+    padding: 5px;
+}
+.chart rect {
+    fill: steelblue;
+}
+.chart text {
+    fill: white;
+    font: 9px sans-serif;
+    text-anchor: end;
+}
+.axis text {
+    fill: black;
+    font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
 }
