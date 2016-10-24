@@ -48,7 +48,7 @@ h4 {
     position: absolute;
     left: 640px;
     top: 5px;
-    width: 300px;
+    width: 120px;
     height: 20px;
     padding: 4px;
     overflow: hidden;
@@ -123,19 +123,6 @@ h4 {
     z-index: 1;
     border: 1px solid #cccccc;
     background: #ccddf2;
-}
-#compareGraphDiv {
-    position: absolute;
-    left: 640px;
-    top: 5px;
-    width: 500px;
-    height: 590px;
-    padding: 2px;
-    overflow: hidden;
-    z-index: 2;
-    border: 1px solid #cccccc;
-    background: #ffffff;
-    display: inline;
 }
 #compareMapDiv {
     position: absolute;

@@ -17,15 +17,20 @@
  *
  * Depends on Messages.js for error reporting!
  *
- * @version 1.0 [November 2015]
+ * @version 1.1 [December 2015]
+ *
+ * added CBS REST Open Data (using OData3 json output) to DataLoader().attributes
+ *
+ * version 1.0 [November 2015]
+ *
  * first version supports
- * geoData: geojson, topojson
- * attribData: geojson, topojson, csv
+ * geometries: geojson, topojson
+ * attributes: geojson, topojson, csv
  *
  */
 
 
-DataLoader = function () {
+function DataLoader() {
     var loadedCallback = null;
     var toload = {};
     var dataLoaded = {};
@@ -61,7 +66,27 @@ DataLoader = function () {
         },
         attributes: function (name, dataFormat, url, FK) {
             toload[name] = url;
-            if (dataFormat == "geojson") {
+            if (dataFormat == "odata") {
+                d3.json(url, function (error, d) {
+                    if (error != undefined) showError(error, url);
+                    //create a map using FK as key:
+                    var attribData = d3.map();
+                    d.value.forEach(function (f) {
+                        var FKval = f[FK];
+                        var valuesObj = f;
+                        if (FKval == undefined || valuesObj == undefined) {
+                            Messages.setMessage(["Geen geldige FK. Check metadata!\nFK=" + FK + "; FKval=" + FKval,
+                                "No valid FK. Check metadata!\n(FK=" + FK + "; FKval=" + FKval], Messages.errorMsg);
+                        }
+                        if (typeof(FKval) == "string") FKval = FKval.trimRight();
+                        for (var aValueObj in valuesObj)  { //trim extra whitespace of string values:
+                            if (typeof(valuesObj[aValueObj]) == "string") valuesObj[aValueObj] = valuesObj[aValueObj].trimRight();
+                        };
+                        attribData.set(FKval, valuesObj);
+                    });
+                    return loaded(name, attribData);
+                });
+            } else if (dataFormat == "geojson") {
                 d3.json(url, function (error, d) {
                     if (error != undefined) showError(error, url);
                     //create a map using FK as key:
@@ -82,7 +107,6 @@ DataLoader = function () {
                     if (error != undefined) showError(error, url);
                     //create a map using FK as key:
                     var attribData = d3.map();
-                    DEBUG1 = topojson.feature(d, d.objects.geo).features;
                     topojson.feature(d, d.objects.geo).features.forEach(function (f) {
                         var FKval =  f.properties[FK];
                         var valuesObj =  f.properties;
@@ -127,10 +151,13 @@ DataLoader = function () {
 ;
 
 function showError(error, url) {
-    if (error.status == undefined) { // it's not XMLHTTPrequest error}
+    if (error.status == undefined) { // it's not an XMLHTTPrequest error}
         theError = error.name + ": " + error.message;
+    } else if (error.status == 0) {
+        theError = "HTTP " + error.status + " -- " + "Internet disconnected?";
+
     } else {
-        theError = "HTTP " + error.status + "--" + error.statusText;
+        theError = "HTTP " + error.status + " -- " + error.statusText;
     }
     Messages.setMessage(["ACHTERGRONDKAART LADEN MISLUKT!\nURL= " + url + ";\nError: " + theError,
         "ERROR LOADING BACKGROUND MAP!\nURL= " + url + ";\nError: " + theError], Messages.errorMsg);

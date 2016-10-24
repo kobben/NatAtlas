@@ -6,30 +6,33 @@
  *
  * @author Barend Köbben - b.j.kobben@utwente.nl
  *
- * @version 0.8 [December 2015]
- * -- see ChangeList in README.md
+ * @version 0.9 [October 2016]
+ *
+ *
+ * other changes/versions: see ChangeList in README.md
  */
 
 
-var DEBUG,DEBUG1;
+var DEBUG,DEBUG1; // temp globals for debugging
 
 
 // metadata as bootstrap, all other necessary data is in there:
-var METADATA_URL;
-METADATA_URL = "./data/metaData.json";
+var METADATA_URL = "./data/metaData.json";
 var MD; //global MetaDataObject
 
-// global vars:
-var VIEWER_VERSION = "0.8";
+// global constants:
+var VIEWER_VERSION = "0.9";
 var debugOn = true; //activates debugging message window
 var NL = 0, EN = 1;
-// For now mapDiv fixed to 550x650 (here and in CSS style)
+var typeNum = 0, typeStr = 1;
+
+// For now mapDiv fixed to 500x590 (here AND in CSS style)
 // TODO: Make rescalable (responsive?)
 var mapDivHeight = 590, mapDivWidth = 500;
 var mapVis = 0, graphVis = 1;
 var numClasses = 5;
-var minCircleSize = 0;
-var maxCircleSize = 20;
+var defaultMinCircleSize = 0;
+var defaultMaxCircleSize = 25;
 var curLang;
 var mainMap, mainMapBG, compareMap, compareMapBG;
 var map_dims = {map_scale: 0.0, y_offset: 0.0, x_offset: 0.0};
@@ -37,20 +40,16 @@ var mainLegendDiv, compareLegendDiv, compareDiv, compareToolsDiv,
     compareMapDiv, compareToolsDiv, messageDiv;
 var geo_path;
 var tooltip;
-var xSliderElem;
-var oSliderElem;
-var wSliderElem;
-var bCheckElem;
-var xScale = d3.scale.linear()
+var xSliderElem, oSliderElem, wSliderElem, bCheckElem;
+var xScale = d3.scaleLinear()
     .range([135, 770])
     .domain([0, 1]);
-var oScale = d3.scale.linear()
+var oScale = d3.scaleLinear()
     .range([0, 1])
     .domain([0, 100]);
-var wScale = d3.scale.linear()
+var wScale = d3.scaleLinear()
     .range([0, 500])
     .domain([0, 100]);
-
 
 
 /**
@@ -147,7 +146,7 @@ function init(language) {
 
                 // initiate d3 geo path stream for handling geometric data
                 // use AffineTransformation function to override default d3 projection mechanism
-                geo_path = d3.geo.path()
+                geo_path = d3.geoPath()
                     .projection(new AffineTransformation(map_dims.map_scale, 0, 0, -(map_dims.map_scale),
                         map_dims.x_offset, map_dims.y_offset))
                 ;
@@ -176,7 +175,7 @@ function init(language) {
 
 /**
  * Implements Affine transformation as a pseudo d3 projection,
- * overriding standard d3.geo.projection.stream, because we do
+ * overriding standard d3.geoProjection.stream, because we do
  * NOT want projection from latlon to cartesian and resampling,
  * but instead translate & scale RD coordinates into screen coordinates
  *
@@ -222,7 +221,6 @@ function AffineTransformation(a, b, c, d, tx, ty) {
  * from MD = the global metadata object for maps
  */
 function showMapGroups() {
-
     hideCompareMap() ;
     //fold open div:
     d3.select("#chooserDiv")
@@ -235,6 +233,7 @@ function showMapGroups() {
     d3.select("#mSubject").selectAll("input").remove();
     d3.select("#mUnit").selectAll("input").remove();
     d3.select("#mDate").selectAll("input").remove();
+    d3.select("#mType").selectAll("input").remove();
     var mapGroupsList = d3.select("#mGroup");
     for (i = 0; i < MD.mapgroups.length; i++) {
         mapGroupsList.append("input")
@@ -246,7 +245,6 @@ function showMapGroups() {
 }
 
 function showMapSubjects(mapGroup) {
-
     //clean up open menus:
     d3.select("#mSubject").selectAll("input").remove();
     d3.select("#mUnit").selectAll("input").remove();
@@ -262,7 +260,6 @@ function showMapSubjects(mapGroup) {
 }
 
 function showMapUnits(mapGroup, mapSubject) {
-
     //clean up open menus:
     d3.select("#mUnit").selectAll("input").remove();
     d3.select("#mDate").selectAll("input").remove();
@@ -277,7 +274,6 @@ function showMapUnits(mapGroup, mapSubject) {
 }
 
 function showMapDates(mapGroup, mapSubject, mapUnit) {
-
     //clean up open menus:
     d3.select("#mDate").selectAll("input").remove();
     var mapDatesList = d3.select("#mDate");
@@ -285,20 +281,19 @@ function showMapDates(mapGroup, mapSubject, mapUnit) {
         mapDatesList.append("input")
             .attr("type", "button")
             .attr("value", MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits[mapUnit].mapdates[i].date)
-            .attr("onclick", "createMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ");")
+            .attr("onclick", "createMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ", mainMap" + ");")
         ;
     }
 }
 
 
-
 /**
  * Create comparemap menus
  * from MD = the global metadata object for maps to compare
- * [TODO: for now the same as the main MD]
+ * for now the same as the main MD
+ * [TODO: make dependent on MainMap]
  */
 function showCompareGroups() {
-
     showCompareMap() ;
     //fold open div:
     d3.select("#compareDiv")
@@ -311,6 +306,7 @@ function showCompareGroups() {
     d3.select("#cSubject").selectAll("input").remove();
     d3.select("#cUnit").selectAll("input").remove();
     d3.select("#cDate").selectAll("input").remove();
+    d3.select("#cType").selectAll("input").remove();
     var mapGroupsList = d3.select("#cGroup");
     for (i = 0; i < MD.mapgroups.length; i++) {
         mapGroupsList.append("input")
@@ -322,7 +318,6 @@ function showCompareGroups() {
 }
 
 function showCompareSubjects(mapGroup) {
-
     //clean up open menus:
     d3.select("#cSubject").selectAll("input").remove();
     d3.select("#cUnit").selectAll("input").remove();
@@ -338,7 +333,6 @@ function showCompareSubjects(mapGroup) {
 }
 
 function showCompareUnits(mapGroup, mapSubject) {
-
     //clean up open menus:
     d3.select("#cUnit").selectAll("input").remove();
     d3.select("#cDate").selectAll("input").remove();
@@ -353,7 +347,6 @@ function showCompareUnits(mapGroup, mapSubject) {
 }
 
 function showCompareDates(mapGroup, mapSubject, mapUnit) {
-
     //clean up open menus:
     d3.select("#cDate").selectAll("input").remove();
     var mapDatesList = d3.select("#cDate");
@@ -361,7 +354,7 @@ function showCompareDates(mapGroup, mapSubject, mapUnit) {
         mapDatesList.append("input")
             .attr("type", "button")
             .attr("value", MD.mapgroups[mapGroup].mapsubjects[mapSubject].mapunits[mapUnit].mapdates[i].date)
-            .attr("onclick", "createCompareMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ");")
+            .attr("onclick", "createMap(" + mapGroup + "," + mapSubject + "," + mapUnit + "," + i + ", compareMap" + ");")
         ;
     }
 }
@@ -376,7 +369,7 @@ function showCompareDates(mapGroup, mapSubject, mapUnit) {
  */
 function createBackgroundMap(mapLayer, theFormat, URL, theClassAttr) {
     Messages.setMessage(["ACHTERGRONDKAART LADEN...", "LOADING BACKGROUND MAP..."], Messages.showMsg);
-    Messages.setMessage(["", mapLayer[0][0].id + ": " + URL], Messages.debugMsg);
+    Messages.setMessage(["", mapLayer.attr("id") + "; URL=" + URL], Messages.debugMsg);
     DataLoader()
         .geometries('BGMap', theFormat, URL)
         .onload(function (dataLoaded) {
@@ -400,14 +393,25 @@ function createBackgroundMap(mapLayer, theFormat, URL, theClassAttr) {
  *
 // * */
 
-function createMap(mapgroup, mapsubject, mapunit, mapdate) {
+function createMap(mapgroup, mapsubject, mapunit, mapdate, mapLayer) {
 
-    //fold down chooserDiv:
-    d3.select("#chooserDiv")
-        .transition().duration(250)
-        .style("width", "120px")
-        .style("height", "20px")
-    ;
+    if (mapLayer == mainMap) {
+        //fold down chooserDiv:
+        d3.select("#chooserDiv")
+            .transition().duration(250)
+            .style("width", "120px")
+            .style("height", "20px")
+        ;
+    } else { //mapLayer == compareMap
+        //fold down compareDiv:
+        d3.select("#compareDiv")
+            .transition().duration(250)
+            .style("width", "120px")
+            .style("height", "20px")
+        ;
+        showCompareMap();
+    }
+
     var geoData = undefined; // empty data layer
     var attribData = undefined; // empty attrib layer
 
@@ -430,10 +434,11 @@ function createMap(mapgroup, mapsubject, mapunit, mapdate) {
 
         try {
             var geoMD = MD.geo_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].geo_data];
+            var geoFK = geoMD.FKattrib;
             var geoURL = geoMD.serviceURL;
             var attribMD = MD.attrib_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].attrib_data];
+            var atrribFK = attribMD.FKattrib;
             var attribURL = attribMD.serviceURL;
-            var FK = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].FK;
         } catch (e) {
             console.log(e);
         }
@@ -443,14 +448,14 @@ function createMap(mapgroup, mapsubject, mapunit, mapdate) {
 
         DataLoader()
             .geometries('geoData', geoMD.serviceOutputFormat, geoURL)
-            .attributes('attribData', attribMD.serviceOutputFormat, attribURL, FK)
+            .attributes('attribData', attribMD.serviceOutputFormat, attribURL, atrribFK)
             .onload(function (dataLoaded) {
 
                 Messages.setMessage(["Data geladen.", "Data loaded."], Messages.hideMsg);
-                createMapPlaceholders(dataLoaded.geoData, mainMap);
-                symboliseMap(dataLoaded.attribData, FK, mainMap, mapgroup, mapsubject, mapunit, mapdate);
+                createMapPlaceholders(dataLoaded.geoData, mapLayer);
+                symboliseMap(dataLoaded.attribData, atrribFK, mapLayer, mapgroup, mapsubject, mapunit, mapdate);
                 Messages.setMessage(["Kaart gemaakt.", "Created map."], Messages.hideMsg);
-                showCompareBtn();
+                if (mapLayer == mainMap) showCompareBtn();
 
                 }
             );
@@ -458,71 +463,6 @@ function createMap(mapgroup, mapsubject, mapunit, mapdate) {
     } //if-else
 
 } // endfunction createMap()
-
-/**
- * trigger mapmaking according to mapgroup/etc chosen in menu
- *
- * */
-function createCompareMap(mapgroup, mapsubject, mapunit, mapdate) {
-
-    //fold down compareDiv:
-    d3.select("#compareDiv")
-        .transition().duration(250)
-        .style("width", "120px")
-        .style("height", "20px")
-    ;
-    showCompareMap();
-
-    var geoData = undefined; // empty data layer
-    var attribData = undefined; // empty attrib layer
-
-    if (mapgroup == -1 || mapsubject == -1 || mapunit == -1 || mapdate == -1
-        || MD.mapgroups[mapgroup] == undefined
-        || MD.mapgroups[mapgroup].mapsubjects[mapsubject] == undefined
-        || MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit] == undefined
-        || MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate] == undefined) {
-        Messages.setMessage(
-            ["Geen metadata voor kaart [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]",
-                "No metadata for map [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]"
-            ], Messages.errorMsg);
-
-        return;
-    } else {
-
-        Messages.setMessage(["KAART MAKEN [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]...",
-                "CREATING MAP [" + mapgroup + "," + mapsubject + "," + mapunit + "," + mapdate + "]..."],
-            Messages.showMsg);
-
-        try {
-            var geoMD = MD.geo_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].geo_data];
-            var geoURL = geoMD.serviceURL;
-            var attribMD = MD.attrib_sources[MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].attrib_data];
-            var attribURL = attribMD.serviceURL;
-            var FK = MD.mapgroups[mapgroup].mapsubjects[mapsubject].mapunits[mapunit].mapdates[mapdate].FK;
-        } catch (e) {
-            console.log(e);
-        }
-
-        Messages.setMessage(["", "Loading geodata; URL=" + geoURL], Messages.debugMsg);
-        Messages.setMessage(["", "Loading attribute data; URL=" + attribURL], Messages.debugMsg);
-
-        DataLoader()
-            .geometries('geoData', geoMD.serviceOutputFormat, geoURL)
-            .attributes('attribData', attribMD.serviceOutputFormat, attribURL, FK)
-            .onload(function (dataLoaded) {
-
-                    Messages.setMessage(["Data geladen.", "Data loaded."], Messages.hideMsg);
-                    createMapPlaceholders(dataLoaded.geoData, compareMap);
-                    symboliseMap(dataLoaded.attribData, FK, compareMap, mapgroup, mapsubject, mapunit, mapdate);
-                    Messages.setMessage(["Kaart gemaakt.", "Created map."], Messages.hideMsg);
-                    showCompareBtn();
-
-                }
-            );
-
-    } //if-else
-
-} // endfunction createCompareMap()
 
 
 function showCompareBtn() {
@@ -577,7 +517,7 @@ function createMapPlaceholders(geoData, mapLayer) {
             return y = Math.round(geo_path.centroid(d)[1]);
         }) // transform the supplied json geo path centroid Y to svg "cy"
         .attr("class", "defaultCircles")  // add default style (from css)
-        .attr("r", 0)    // add radius , start with r = 0
+        .attr("r", 0)    // init radius r = 0
         .on("mousemove", function () {
             toolTipMove(d3.event)
         })
@@ -651,13 +591,10 @@ function symboliseMap(attribData, FK, mapLayer, mapgroup, mapsubject, mapunit, m
             .on("mouseenter", function (d) {
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
-            .transition().ease("bounce").duration(2000)
-            .attr("r", function (d) {
-                var theVal = getAttribValue(d, attribData, mapAttrib, mapFK);
-                var theRadius = (Math.sqrt(theVal) / Math.PI) * dataStats.dCircleRatio;
-                if (theRadius < 0) theRadius = 0;
-                return theRadius;
-            })  // change radius with result from function
+            .transition().ease(d3.easeBounceOut).duration(2000)
+            .attr("r", function (d) { // change radius based on value
+                return dataStats.dClass2Size(+getAttribValue(d, attribData, mapAttrib, mapFK, typeNum));
+            })
         ;
 
 // *** CHOROPLETH MAPS ****
@@ -681,7 +618,7 @@ function symboliseMap(attribData, FK, mapLayer, mapgroup, mapsubject, mapunit, m
             .attr("class", "classedPolygons") //to avoid being treated as background!
             .style("fill", function (d) {
                 // fill with result from classify function
-                return dataStats.dClass2Value(+getAttribValue(d, attribData, mapAttrib, mapFK));
+                return dataStats.dClass2Value(+getAttribValue(d, attribData, mapAttrib, mapFK, typeNum));
             })
         ;
 
@@ -707,12 +644,12 @@ function symboliseMap(attribData, FK, mapLayer, mapgroup, mapsubject, mapunit, m
                 toolTipShow(infoTextFromData(d, attribData, tooltipLabel, mapAttrib, mapFK, mapUnit));
             })
             .text(function (d) {
-                return getAttribValue(d, attribData, mapAttrib, mapFK);
+                return getAttribValue(d, attribData, mapAttrib, mapFK, typeStr);
             })
         ;
 
         // *** CHOROCHROMATIC MAPS ****
-    } else if (mapType == "area_colour") { // simple label map:
+    } else if (mapType == "area_colour") { // simple nominal map:
         dataStats = makeStats(attribData, mapAttrib, mapType, mapClassification);
         // shrink circles :
         mapLayer.selectAll("circle")   // select again all the current circle nodes
@@ -731,7 +668,7 @@ function symboliseMap(attribData, FK, mapLayer, mapgroup, mapsubject, mapunit, m
             .transition().duration(1500)
             .attr("class", "classedPolygons") //to avoid being treated as background!
             .style("fill", function (d) {
-                return dataStats.dClass2Colour(getAttribValue(d, attribData, mapAttrib, mapFK));
+                return dataStats.dClass2Colour(getAttribValue(d, attribData, mapAttrib, mapFK, typeStr));
             })  // fill with result from classify function
         ;
 
@@ -747,19 +684,6 @@ function symboliseMap(attribData, FK, mapLayer, mapgroup, mapsubject, mapunit, m
     } else {
         makeLegend(compareLegendDiv, mapgroup, mapsubject, mapunit, mapdate, mapType, mapClassification, dataStats);
     }
-}
-
-function getAttribValue(d, attribData, mapAttrib, mapFK) {
-    var FKval = undefined;
-    var attribValue = undefined;
-    try {
-        FKval = d.properties[mapFK];
-        attribValue = attribData.get(FKval)[mapAttrib];
-    } catch (e) {
-        Messages.setMessage(["Fout in data!\nFK=" + FKval + "; attribuut=" + mapAttrib + "; waarde=" + attribValue,
-        "Error retrieving data!\n(FK=" + FKval + "; attribute=" + mapAttrib + "; value=" + attribValue], Messages.errorMsg);
-    }
-    return attribValue;
 }
 
 /**
@@ -790,6 +714,9 @@ function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType
             .attr("height", "100%")
         ;
 
+    var legSymWidth = 20;
+    var legSymHeight = 15;
+    var legPadding = 2;
 
     // *** PROPORTIONAL POINT MAPS ****
     if (mapType == "point_size") {
@@ -798,18 +725,17 @@ function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType
             .attr("class", "mySizeLegend")
             .attr("transform", "translate(20,20)")
         ;
-        var linearSize = d3.scale.linear().domain([0, dataStats.dMax]).range([0, maxCircleSize]);
-        //var linearSize = d3.scale.linear().domain([0,100]).range([10, 20]);
 
-        var mySizeLegend = d3.legend.size()
-                .scale(linearSize)
+        var mySizeLegend = d3.legendSize()
                 .labelFormat(d3.format(mapClassification.format))
                 .shape('circle')
-                .shapePadding(2)
+                .shapePadding(legPadding)
                 .labelOffset(1)
-                .cells(4)
+                .cells([dataStats.dMin, (dataStats.dMax /2), dataStats.dMax])
                 .orient('vertical')
+                .scale(dataStats.dClass2Size)
             ;
+
         legendSVG.select(".mySizeLegend")
             .call(mySizeLegend)
         ;
@@ -822,7 +748,9 @@ function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType
         }
         legendSVG.selectAll("circle").style("fill", myCol);
 
-        legendSVG.style("height", mySizeLegend.legendHeight());
+        // numclasses in legend = mySizeLegend.cells = 3
+        var legendHeight = ((defaultMaxCircleSize*2 + legPadding) * mySizeLegend.cells().length);
+        legendSVG.style("height", legendHeight);
 
         // *** CHOROPLETH MAPS ****
     } else if (mapType == "area_value") { // choropleth map:
@@ -832,10 +760,13 @@ function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType
             .attr("class", "myColorLegend")
             .attr("transform", "translate(0,0)")
         ;
-        var myColorLegend = d3.legend.color()
+
+        var myColorLegend = d3.legendColor()
                 .labelFormat(d3.format(mapClassification.format))
                 .labelDelimiter("–")
-                .shapeWidth(20)
+                .shapeWidth(legSymWidth)
+                .shapeHeight(legSymHeight)
+                .shapePadding(legPadding)
                 .useClass(false)
                 .orient('vertical')
                 .scale(dataStats.dClass2Value)
@@ -843,7 +774,9 @@ function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType
         legendSVG.select(".myColorLegend")
             .call(myColorLegend)
         ;
-        legendSVG.style("height", myColorLegend.legendHeight());
+        // numclasses in legend = scale domain - 1
+        var legendHeight = ((legSymHeight + legPadding) * (dataStats.dClass2Value.domain().length - 1));
+        legendSVG.style("height", legendHeight);
 
         // *** LABEL MAPS ****
     } else if (mapType == "area_label") { // simple label map:
@@ -854,19 +787,23 @@ function makeLegend(whichLegend, mapgroup, mapsubject, mapunit, mapdate, mapType
     } else if (mapType == "area_colour") { // simple label map:
 
         legendSVG.append("g")
-            .attr("class", "myLegend")
+            .attr("class", "myColorLegend")
             .attr("transform", "translate(0,0)")
         ;
-        var legend = d3.legend.color()
+        var myColorLegend = d3.legendColor()
                 .labelFormat(d3.format(".0f"))
-                .shapeWidth(20)
+                .shapeWidth(legSymWidth)
+                .shapeHeight(legSymHeight)
+                .shapePadding(legPadding)
                 .useClass(false)
                 .scale(dataStats.dClass2Colour)
             ;
-        legendSVG.select(".myLegend")
-            .call(legend)
+        legendSVG.select(".myColorLegend")
+            .call(myColorLegend)
         ;
-        legendSVG.style("height", legend.legendHeight());
+        // numclasses in legend = scale domain
+        var legendHeight = ((legSymHeight + legPadding) * (dataStats.dClass2Colour.domain().length));
+        legendSVG.style("height", legendHeight);
 
     } else {
         Messages.setMessage(
@@ -904,67 +841,87 @@ function toolTipShow(theText) {
 function infoTextFromData(d, attribData, labelAttrib, mapAttrib, mapFK, mapUnit) {
     var theText = "";
     if (labelAttrib != mapAttrib) {
-        theText += getAttribValue(d, attribData, labelAttrib, mapFK) + ": "
+        theText += getAttribValue(d, attribData, labelAttrib, mapFK, typeStr) + ": "
     }
-    theText += getAttribValue(d, attribData, mapAttrib, mapFK) + " " + mapUnit;
+    theText += getAttribValue(d, attribData, mapAttrib, mapFK, typeStr) + " " + mapUnit;
     return theText;
 }
 
+function getAttribValue(d, attribData, theAttrib, theFK, asType) {
+    var FKval = undefined;
+    var attribValue = undefined;
+    try {
+        FKval = d.properties[theFK];
+        attribValue = attribData.get(FKval)[theAttrib];
+    } catch (e) {
+        Messages.setMessage(["Kan attribuut [" + theAttrib + "] niet vinden voor deze kaarteenheid [key=" + FKval + "]",
+            "Error retrieving attribute [" + theAttrib + "] for this map unit [key=" + FKval + "]"], Messages.errorMsg);
+        if (asType == typeNum) {attribValue = 0} else {attribValue = "[no data]"};
+    }
+    if (asType == typeNum) {return Number(attribValue); } else {return attribValue};
+    ;
+}
 
 function makeStats(attribData, attrib, mapType, mapClassification) {
 
-    var myStats = {
-        dValues: undefined, dMin: undefined, dMax: undefined, dCircleRatio: undefined,
-        dClasses: undefined, dClass2Value: undefined, dClass2Colour: undefined
+    var dataStats = {
+        dValues: undefined, dMin: undefined, dMax: undefined, dClasses: undefined,
+        dClass2Size: undefined, dClass2Value: undefined, dClass2Colour: undefined
     };
 
     var numFeatures = attribData.size();
-    myStats.dValues = new Array(numFeatures);
-    var i = 0;
+    dataStats.dValues = new Array(numFeatures);
     var errorStr = "";
-    attribData.forEach(function (k, v) {
+    var dataKeys = attribData.keys();
+
+    for (i=0; i < dataKeys.length; i++) {
+        //console.log(attribData.get(dataKeys[i])[attrib]);
         if (mapType == "point_size" || mapType == "area_value") {
-            myStats.dValues[i] = + v[attrib]; //+ to force numerical
-            if (myStats.dValues[i] == undefined || isNaN(myStats.dValues[i])) {
-                errorStr = "Maptype=" + mapType + "; data=" + myStats.dValues[i];
+            dataStats.dValues[i] = + attribData.get(dataKeys[i])[attrib]; //+ to force numerical
+            if (dataStats.dValues[i] == undefined || isNaN(dataStats.dValues[i])) {
+                errorStr = "Maptype=" + mapType + "; data=" + dataStats.dValues[i];
             }
         } else { //area_label or area_colour
-            myStats.dValues[i] = v[attrib];
-            if (myStats.dValues[i] == undefined) {
-                errorStr = "Maptype=" + mapType + "; data=" + myStats.dValues[i];
+            dataStats.dValues[i] = attribData.get(dataKeys[i])[attrib];
+            if (dataStats.dValues[i] == undefined) {
+                errorStr = "Maptype=" + mapType + "; data=" + dataStats.dValues[i];
             }
         }
-        i++;
-    });
+    }
     if (errorStr != "") {
         Messages.setMessage(["ONGELDIGE DATA VOOR DIT MAPTYPE!\n" + errorStr,
             "INVALID DATA FOR THIS MAPTYPE!\n" + errorStr], Messages.errorMsg);
-        console.log(myStats.dValues);
+        console.log(dataStats.dValues);
     }
-
-    var clStr = "type=" + mapClassification.type + "; numclasses=" + mapClassification.numclasses + "; classes="
+    var clStr = "1: type=" + mapClassification.type + "; numclasses=" + mapClassification.numclasses + "; classes="
         + mapClassification.classes + "; colours=" + mapClassification.colours + "; format=" + mapClassification.format;
     console.log(clStr);
 
     // *** PROPORTIONAL POINT MAPS ****
     if (mapType == "point_size") {
-        myStats.dMin = d3.min(myStats.dValues);
+        dataStats.dMin = d3.min(dataStats.dValues);
         //TODO: less crappy solution for NoData vals:
-        if (myStats.dMin <= -99999997) { // is NoData
-            myStats.dMin = 0
+        if (dataStats.dMin <= -99999997) { // is NoData
+            dataStats.dMin = 0
         }
-        myStats.dMax = d3.max(myStats.dValues);
-        // a ratio between values and circles radius for (proportional) ratio maps:
-        myStats.dCircleRatio = maxCircleSize / (Math.sqrt(myStats.dMax) / Math.PI );
+        dataStats.dMax = d3.max(dataStats.dValues);
+        // the ratio between values and circle radius for proportional symbols:
+        var val2RadiusRatio = defaultMaxCircleSize / (Math.sqrt(dataStats.dMax) / Math.PI );
+        dataStats.dClass2Size =  d3.scaleLinear()
+            .domain([dataStats.dMin, dataStats.dMax])
+            .range([(Math.sqrt(dataStats.dMin) / Math.PI) * val2RadiusRatio,
+                (Math.sqrt(dataStats.dMax) / Math.PI) * val2RadiusRatio])
+        ;
+
 
         // *** CHOROPLETH MAPS ****
     } else if (mapType == "area_value") { // choropleth map:
-        myStats.dMin = d3.min(myStats.dValues);
+        dataStats.dMin = d3.min(dataStats.dValues);
         //TODO: less crappy solution for NoData vals:
-        if (myStats.dMin <= -99999997) { // is NoData
-            myStats.dMin = 0
+        if (dataStats.dMin <= -99999997) { // is NoData
+            dataStats.dMin = 0
         }
-        myStats.dMax = d3.max(myStats.dValues);
+        dataStats.dMax = d3.max(dataStats.dValues);
         if (mapClassification.numclasses == undefined) {
             mapClassification.numclasses = 5;
         }
@@ -972,26 +929,26 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
             InvalidClassMessage(clStr + "\nInvalid numclasses (<3 or >11).");
         }
         if (mapClassification.type == "jenks") { //use jenks.js to calculate Jenks Natural breaks
-            myStats.dClasses = jenks(myStats.dValues, mapClassification.numclasses);
+            dataStats.dClasses = jenks(dataStats.dValues, mapClassification.numclasses);
         } else if (mapClassification.type == "manual") { // use manual
             if (mapClassification.classes == undefined) {
                 InvalidClassMessage(clStr + "\nClasses array needed for manual classification.");
             }
             if (mapClassification.classes[0] == "dMin") {
-                mapClassification.classes[0] = myStats.dMin;
+                mapClassification.classes[0] = dataStats.dMin;
             }
             if (mapClassification.classes[mapClassification.classes.length - 1] == "dMax") {
-                mapClassification.classes[mapClassification.classes.length - 1] = myStats.dMax;
+                mapClassification.classes[mapClassification.classes.length - 1] = dataStats.dMax;
             }
             //check manual classes
-            if (mapClassification.classes[0] > myStats.dMin) {
+            if (mapClassification.classes[0] > dataStats.dMin) {
                 InvalidClassMessage(clStr + "\nData min < lowest class.");
-            } else if (mapClassification.classes[mapClassification.classes.length - 1] < myStats.dMax) {
+            } else if (mapClassification.classes[mapClassification.classes.length - 1] < dataStats.dMax) {
                 InvalidClassMessage(clStr + "\nData max > highest class.");
             } else if (mapClassification.classes.length - 1 != mapClassification.numclasses) {
                 InvalidClassMessage(clStr + "\nClasses array length does not match number of classes.");
             } else { // all correct
-                myStats.dClasses = mapClassification.classes;
+                dataStats.dClasses = mapClassification.classes;
             }
 
         } else {
@@ -1003,31 +960,33 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
         } catch (e) {
             InvalidClassMessage(clStr + "\n'" + mapClassification.colours + "' is not a valid ColorBrewer name.");
         }
-        myStats.dClass2Value = d3.scale.quantile()
-            .domain(myStats.dClasses) // use jenks or manual classes (see above)
+        dataStats.dClass2Value = d3.scaleQuantile()
+            .domain(dataStats.dClasses) // use jenks or manual classes (see above)
             .range(CBrange)
         ;
+
 
         // *** LABEL MAPS ****
     } else if (mapType == "area_label") { // simple label map:
 
         // *** CHOROCHROMATIC MAPS ****
-    } else if (mapType == "area_colour") { // simple label map:
+    } else if (mapType == "area_colour") { // chorochromatic map:
 
         // an ordinal scale for (chorochromatic) nominal maps
+        // set numclasses to max number of colours to effectively use (limited to 25)
         if (mapClassification.numclasses == undefined) {
             mapClassification.numclasses = 25; //25 is max for scale MaxColours
         }
         if (mapClassification.numclasses < 3 || mapClassification.numclasses > 25) {
-            InvalidClassMessage(clStr + "\nInvalid numclasses (<3 or >24).");
+            InvalidClassMessage(clStr + "\nInvalid numclasses (<3 or >25).");
         }
         try {
             var CBrange = colorbrewer[mapClassification.colours][mapClassification.numclasses];
         } catch (e) {
             InvalidClassMessage(clStr + "\n'" + mapClassification.colours + "' not valid ColorBrewer name, or no. of classes not available.");
         }
-        myStats.dClass2Colour = d3.scale.ordinal() // make a classes array using d3 ordinal
-            .range(CBrange)
+        dataStats.dClass2Colour = d3.scaleOrdinal() // make a classes array using d3 ordinal
+            .range(CBrange);
 
     } else {
         Messages.setMessage(
@@ -1035,13 +994,13 @@ function makeStats(attribData, attrib, mapType, mapClassification) {
     }
 
     Messages.setMessage(["", "Calculated map statistics."], Messages.debugMsg);
-    //if (debugOn) console.log(myStats);
-    return myStats;
+    if (debugOn) console.log(dataStats);
+    return dataStats;
 }
 
-function InvalidClassMessage(Str) {
-    Messages.setMessage(["ONGELDIGE CLASSIFICATIE!\n" + Str,
-        "INVALID CLASSIFICATION!\n" + Str], Messages.errorMsg);
+function InvalidClassMessage(typeStr) {
+    Messages.setMessage(["ONGELDIGE CLASSIFICATIE!\n" + typeStr,
+        "INVALID CLASSIFICATION!\n" + typeStr], Messages.errorMsg);
 }
 
 

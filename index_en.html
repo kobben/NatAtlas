@@ -2,10 +2,10 @@
 <meta charset="utf-8">
 <head>
 
-    <title>National Atlas [0.8]</title>
+    <title>National Atlas</title>
 
-    <script src="./js/d3.v3.min.js"></script>
-    <script src="./js/d3-legend-bjk.js"></script>
+    <script src="./js/d3.v4.min.js"></script>
+    <script src="./js/d3-legend.min.js"></script>
     <script src="./js/colorbrewer.js"></script>
     <script src="./js/topojson.min.js"></script>
     <script src="./js/jenks.js"></script>
@@ -17,7 +17,7 @@
 
 </head>
 
-<!-- init with language = 1 = english -->
+<!-- init NatAtlas.js with language = 1 = english -->
 <body id="mainWindow" onload="init(1)">
 <div id="chooserDiv">
   <input  id="makeMapBtn" type="button" onclick="showMapGroups()" value="CHOOSE SUBJECT" >
@@ -36,7 +36,7 @@
     </p>
 </div>
 <div id="compareDiv">
-    <input id="cMapBtn" type="button" onclick="showCompareGroups()" value="COMPARE WITH MAP">
+    <input id="cMapBtn" type="button" onclick="showCompareGroups()" value="COMPARE WITH...">
     <p>Theme:<br>
     </p>
     <div id="cGroup"></div>
@@ -47,8 +47,8 @@
     </p>
     <div id="cUnit"></div>
     <p>Date:<br>
-    </p>
     <div id="cDate"></div>
+    </p>
 </div>
 <div id="mainMapDiv"></div>
 <div id="compareMapDiv"></div>

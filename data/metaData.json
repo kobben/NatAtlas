@@ -3,10 +3,10 @@
     "Nationale Atlas van Nederland",
     "National Atlas of The Netherlands"
   ],
-  "atlasVersion": "0.7",
+  "atlasVersion": "0.9",
   "atlasCopyright": [
-    "©2011-15: Stichting Wetenschappelijke Atlas Nederland",
-    "©2011-15: Foundation Scientific Atlas of the Netherlands"
+    "©2016: Stichting Wetenschappelijke Atlas Nederland",
+    "©2016: Foundation Scientific Atlas of the Netherlands"
   ],
   "atlasLanguages": [
     "Nederlands",
@@ -26,7 +26,7 @@
         "Municipalities of the Netherlands, generalised from the Base Registration Cartography of the Kadaster. "
       ],
       "date": "2011",
-      "FK_attrib": "GM_CODE",
+      "FKattrib": "GM_CODE",
       "source": [
         "Kadaster",
         "Kadaster"
@@ -46,7 +46,7 @@
         "Provinces of the Netherlands, aggegrated from municipal borders. "
       ],
       "date": "2011",
-      "FK_attrib": "prov_code",
+      "FKattrib": "prov_code",
       "source": [
         "Kadaster",
         "Kadaster"
@@ -66,7 +66,7 @@
         "Municipalities of the Netherlands, generalised from the Base Registration Cartography of the Kadaster. "
       ],
       "date": "2013",
-      "FK_attrib": "GM_CODE",
+      "FKattrib": "GM_CODE",
       "source": [
         "Kadaster",
         "Kadaster"
@@ -86,7 +86,7 @@
         "Natura 2000-areas consist of a combination of 77 Bird Protection areas and 142 EC Habitat Regulation areas as well as the protected nature conservation areas within."
       ],
       "date": "2012",
-      "FK_attrib": "id",
+      "FKattrib": "id",
       "source": [
         "Helpdesk PDOK",
         "Helpdesk PDOK"
@@ -105,7 +105,7 @@
         "Statistical key numbers municipality (selected from StatLine)"
       ],
       "date": "2011",
-      "FK_attrib": "GM_CODE",
+      "FKattrib": "GM_CODE",
       "source": [
         "Centraal Bureau voor de Statistiek",
         "Statistics Netherlands"
@@ -122,7 +122,7 @@
         "Statistical key numbers province (selected from StatLine)"
       ],
       "date": "2011",
-      "FK_attrib": "prov_code",
+      "FKattrib": "prov_code",
       "source": [
         "Centraal Bureau voor de Statistiek",
         "Statistics Netherlands"
@@ -139,7 +139,7 @@
         "Statistical key numbers municipality (selected from StatLine)"
       ],
       "date": "2013",
-      "FK_attrib": "GM_CODE",
+      "FKattrib": "GM_CODE",
       "source": [
         "Centraal Bureau voor de Statistiek",
         "Statistics Netherlands"
@@ -159,7 +159,7 @@
         "Natura 2000-areas consist of a combination of 77 Bird Protection areas and 142 EC Habitat Regulation areas as well as the protected nature conservation areas within."
       ],
       "date": "2012",
-      "FK_attrib": "id",
+      "FKattrib": "id",
       "source": [
         "Helpdesk PDOK",
         "Helpdesk PDOK"
@@ -179,7 +179,7 @@
         "Selected economic data from StatLine."
       ],
       "date": "2012",
-      "FK_attrib": "prov_code",
+      "FKattrib": "prov_code",
       "source": [
         "CBS StatLine",
         "CBS StatLine"
@@ -199,7 +199,7 @@
         "Selected economic data from StatLine."
       ],
       "date": "2013",
-      "FK_attrib": "GM_CODE",
+      "FKattrib": "GM_CODE",
       "source": [
         "CBS StatLine",
         "CBS StatLine"
@@ -219,7 +219,7 @@
         "Natura2000 Protected Areas"
       ],
       "date": "2012",
-      "FK_attrib": "id",
+      "FKattrib": "id",
       "source": [
         "Helpdesk PDOK",
         "Helpdesk PDOK"
@@ -228,6 +228,40 @@
       "serviceURL": "./data/natura2000/geoandattribs.geojson",
       "serviceTypeName": "",
       "serviceOutputFormat": "geojson"
+    },
+    {
+      "name": "CBSGemeenten 2014 live",
+      "description": [
+        "Statistische kerncijfers gemeente (live feed uit CBS OData)",
+        "Statistical key numbers municipality (live feed from CBS OData)"
+      ],
+      "date": "2014",
+      "FKattrib": "WijkenEnBuurten",
+      "source": [
+        "Centraal Bureau voor de Statistiek",
+        "Statistics Netherlands"
+      ],
+      "serviceType": "REST",
+      "serviceURL": "http://opendata.cbs.nl/ODataAPI/odata/82931NED/TypedDataSet?&$filter=(startswith(WijkenEnBuurten,%20%27GM%27)%20eq%20true)&$select=WijkenEnBuurten,Gemeentenaam_1,AantalInwoners_4",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "odata"
+    },
+    {
+      "name": "CBSGemeenten 2014 offline",
+      "description": [
+        "Statistische kerncijfers gemeente (download uit CBS OData)",
+        "Statistical key numbers municipality (from CBS OData)"
+      ],
+      "date": "2014",
+      "FKattrib": "WijkenEnBuurten",
+      "source": [
+        "Centraal Bureau voor de Statistiek",
+        "Statistics Netherlands"
+      ],
+      "serviceType": "localfile",
+      "serviceURL": "./data/gemeenten/TypedDataSet.json",
+      "serviceTypeName": "",
+      "serviceOutputFormat": "odata"
     }
   ],
   "mapgroups": [
@@ -272,6 +306,22 @@
                   "FK": "GM_CODE",
                   "attrib": "AANT_INW",
                   "label": "GM_NAAM"
+                },
+                {
+                  "date": "2014 online",
+                  "geo_data": 2,
+                  "attrib_data": 7,
+                  "FK": "GM_CODE",
+                  "attrib": "AantalInwoners_4",
+                  "label": "Gemeentenaam_1"
+                },
+                {
+                  "date": "2014 offline",
+                  "geo_data": 2,
+                  "attrib_data": 8,
+                  "FK": "GM_CODE",
+                  "attrib": "AantalInwoners_4",
+                  "label": "Gemeentenaam_1"
                 }
               ]
             },

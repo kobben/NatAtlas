@@ -14,11 +14,19 @@ Author: Barend Köbben - <a href="mailto:b.j.kobben@utwente.nl">b.j.kobben@utwen
 
 ##Changelist:
 
+### version 0.9.0 [September 2016]
+*   now using v4 of the D3 library
+*   now all map symbolisations use d3.scale
+*   now using standard version of d3-legend (by Susie Lu: http://d3-legend.susielu.com), 
+    legend height calculation moved to makeLegend() in NatAtlas.js
+
+### version 0.8.5 [January 2016]
+*   supports CBS REST Open Data (using OData3 json output) in DataLoader().attributes
+
 ### version 0.8 [December 2015]:
 *   got rid of all use of eval(): e.g. eval("d." + FK) => d[FK]
-*   first attempts at breaking up in more js files, with proper classing:
-*   Messages.js
-*   dataloader.js
+*   first attempts at breaking up: re-useable js files, as proper classes: 
+    Messages.js + DataLoader.js
 
 ### 0.7 [August 2015]:
 *   Implementation of mapCompare tools
