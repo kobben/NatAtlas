@@ -1,4 +1,4 @@
-##NatAtlas is a proof-of-concept webapplication.
+## NatAtlas is a proof-of-concept webapplication.
 
 NatAtlas Viewer is a HTML5/SVG webapplication using the D3 Javascript API
 to create  National Atlas webmapping in the framework of the Dutch National GeoData Infrastructure.
@@ -12,7 +12,7 @@ see http://creativecommons.org/licenses/by-nc-sa/3.0/
 Author: Barend Köbben - <a href="mailto:b.j.kobben@utwente.nl">b.j.kobben@utwente.nl</a> --
 <a href="http://kartoweb.itc.nl/kobben">kartoweb.itc.nl/kobben</a>
 
-##Changelist:
+## Changelist:
 
 ### version 0.9.0 [September 2016]
 *   now using v4 of the D3 library
